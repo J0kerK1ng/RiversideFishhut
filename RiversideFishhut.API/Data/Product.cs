@@ -10,8 +10,8 @@ namespace RiversideFishhut.API.Data
         [Key]
         public int ProductId { get; set; }
         public string ProductName { get; set; }
-        public int Dine_in_price { get; set; }
-        public int Take_out_price { get; set; }
+        public double Dine_in_price { get; set; }
+        public double Take_out_price { get; set; }
 
         [ForeignKey(nameof(CategoryId))]
         public int CategoryId { get; set; }

@@ -16,7 +16,7 @@ namespace RiversideFishhut.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.2")
+                .HasAnnotation("ProductVersion", "6.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -130,15 +130,15 @@ namespace RiversideFishhut.API.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Dine_in_price")
-                        .HasColumnType("int");
+                    b.Property<double>("Dine_in_price")
+                        .HasColumnType("float");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Take_out_price")
-                        .HasColumnType("int");
+                    b.Property<double>("Take_out_price")
+                        .HasColumnType("float");
 
                     b.HasKey("ProductId");
 
@@ -151,33 +151,33 @@ namespace RiversideFishhut.API.Migrations
                         {
                             ProductId = 1,
                             CategoryId = 1,
-                            Dine_in_price = 10,
+                            Dine_in_price = 10.0,
                             ProductName = "2Pc Whitefish & Chips",
-                            Take_out_price = 9
+                            Take_out_price = 9.0
                         },
                         new
                         {
                             ProductId = 2,
                             CategoryId = 1,
-                            Dine_in_price = 12,
+                            Dine_in_price = 12.0,
                             ProductName = "2Pc Cod & Chips",
-                            Take_out_price = 11
+                            Take_out_price = 11.0
                         },
                         new
                         {
                             ProductId = 3,
                             CategoryId = 1,
-                            Dine_in_price = 14,
+                            Dine_in_price = 14.0,
                             ProductName = "2Pc Haddock & Chips",
-                            Take_out_price = 13
+                            Take_out_price = 13.0
                         },
                         new
                         {
                             ProductId = 4,
                             CategoryId = 1,
-                            Dine_in_price = 16,
+                            Dine_in_price = 16.0,
                             ProductName = "2Pc Halibut & Chips",
-                            Take_out_price = 15
+                            Take_out_price = 15.0
                         });
                 });
 

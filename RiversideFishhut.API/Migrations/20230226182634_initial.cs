@@ -4,7 +4,7 @@
 
 namespace RiversideFishhut.API.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -78,8 +78,6 @@ namespace RiversideFishhut.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TypeName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AdminPassword = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TypeId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     foodTypeTypeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -100,8 +98,8 @@ namespace RiversideFishhut.API.Migrations
                     ProductId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Dine_in_price = table.Column<int>(type: "int", nullable: false),
-                    Take_out_price = table.Column<int>(type: "int", nullable: false),
+                    Dine_in_price = table.Column<double>(type: "float", nullable: false),
+                    Take_out_price = table.Column<double>(type: "float", nullable: false),
                     CategoryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -113,6 +111,46 @@ namespace RiversideFishhut.API.Migrations
                         principalTable: "categories",
                         principalColumn: "CategoryId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "admins",
+                columns: new[] { "AdminId", "AdminAddress", "AdminName", "AdminPassword" },
+                values: new object[] { 1, "Admin@gmail.com", "Admin", "Admin123" });
+
+            migrationBuilder.InsertData(
+                table: "foodTypes",
+                columns: new[] { "TypeId", "Description", "TypeName" },
+                values: new object[] { 1, "This type is for 2 Pc fish with 1 pack chip.", "2 PC Dinner" });
+
+            migrationBuilder.InsertData(
+                table: "staffs",
+                columns: new[] { "StaffId", "Password", "Position", "StaffName" },
+                values: new object[,]
+                {
+                    { 1, "Password1", "Reception", "Staff 1" },
+                    { 2, "Password2", "back kitchen", "Staff 2" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "websiteInfos",
+                columns: new[] { "InfoId", "Address", "BusinessHour", "Description", "OnlineOrderLink", "Phone", "StoreName" },
+                values: new object[] { 1, "157 king st west Cambridge, ON, N3H 1B5", "Monday closedTuesday 11:30am - 7:30pmWednesday 11:30am - 7:30pmThursday 11:30am - 7:30pmFriday 11:30am - 7:30pmSaturday 11:30am - 8:00pmSunday closed", "This cozy restaurant specializes in traditional English fish and French fries, serving up freshly fried, crispy and flavorful fish sourced from local suppliers, and thick golden fries that make the perfect side dish.", "https://www.skipthedishes.com/riverside-fish-hut?utm_source=riversidefishhutmenu.ca&utm_medium=microsites&utm_campaign=microsites", "519-653-0788", "Riverside Fishhut" });
+
+            migrationBuilder.InsertData(
+                table: "categories",
+                columns: new[] { "CategoryId", "Description", "TypeName", "foodTypeTypeId" },
+                values: new object[] { 1, "Main Dish", "2 PC Dinner", 1 });
+
+            migrationBuilder.InsertData(
+                table: "products",
+                columns: new[] { "ProductId", "CategoryId", "Dine_in_price", "ProductName", "Take_out_price" },
+                values: new object[,]
+                {
+                    { 1, 1, 10.0, "2Pc Whitefish & Chips", 9.0 },
+                    { 2, 1, 12.0, "2Pc Cod & Chips", 11.0 },
+                    { 3, 1, 14.0, "2Pc Haddock & Chips", 13.0 },
+                    { 4, 1, 16.0, "2Pc Halibut & Chips", 15.0 }
                 });
 
             migrationBuilder.CreateIndex(
