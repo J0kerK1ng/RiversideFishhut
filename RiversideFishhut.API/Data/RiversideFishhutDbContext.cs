@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RiversideFishhut.API.Data;
 
 namespace RiversideFishhut.API.Data
 {
@@ -153,5 +154,9 @@ namespace RiversideFishhut.API.Data
                 }
                 );
         }
+
+        public DbSet<RiversideFishhut.API.Data.Order> Order { get; set; }
+
+        public DbSet<RiversideFishhut.API.Data.OrderLineItem> OrderLineItem { get; set; }
     }
 }

@@ -5,6 +5,7 @@ namespace RiversideFishhut.API.Data
 {
     public class OrderLineItem
     {
+        [Key]
         public int OrderLineItemId { get; set; }
 
         [ForeignKey(nameof(OrderId))]
