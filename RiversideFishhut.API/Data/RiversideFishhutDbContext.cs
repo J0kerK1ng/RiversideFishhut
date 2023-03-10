@@ -15,6 +15,8 @@ namespace RiversideFishhut.API.Data
         public DbSet<Product> products { get; set; }
         public DbSet<Staff> staffs { get; set; }
         public DbSet<WebsiteInfo> websiteInfos { get; set; }
+        public DbSet<OrderType> orderType { get; set; }
+        public DbSet<OrderStatus> orderStatus { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -110,6 +112,46 @@ namespace RiversideFishhut.API.Data
 
                }
                );
+            modelBuilder.Entity<OrderType>().HasData(
+                new OrderType
+                {
+                    OrderTypeId = 1,
+                    TypeName = "Dine In"
+                },
+                new OrderType
+                {
+                    OrderTypeId = 2,
+                    TypeName = "Take Out"
+                },
+                new OrderType
+                {
+                    OrderTypeId = 3,
+                    TypeName = "Phone Order"
+                }
+                );
+
+            modelBuilder.Entity<OrderStatus>().HasData(
+                new OrderStatus
+                {
+                    OrderStatusId = 1,
+                    OrderStatusName = "Ordered"
+                },
+                new OrderStatus
+                {
+                    OrderStatusId = 2,
+                    OrderStatusName = "In Progress"
+                },
+                new OrderStatus
+                {
+                    OrderStatusId = 3,
+                    OrderStatusName = "Ready"
+                },
+                new OrderStatus
+                {
+                    OrderStatusId = 4,
+                    OrderStatusName = "Complete"
+                }
+                );
         }
     }
 }
