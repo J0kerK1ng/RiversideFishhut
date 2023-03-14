@@ -24,14 +24,14 @@ namespace RiversideFishhut.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderLineItem>>> GetOrderLineItem()
         {
-            return await _context.OrderLineItem.ToListAsync();
+            return await _context.orderLineItem.ToListAsync();
         }
 
         // GET: api/OrderLineItems/5
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderLineItem>> GetOrderLineItem(int id)
         {
-            var orderLineItem = await _context.OrderLineItem.FindAsync(id);
+            var orderLineItem = await _context.orderLineItem.FindAsync(id);
 
             if (orderLineItem == null)
             {
@@ -77,7 +77,7 @@ namespace RiversideFishhut.API.Controllers
         [HttpPost]
         public async Task<ActionResult<OrderLineItem>> PostOrderLineItem(OrderLineItem orderLineItem)
         {
-            _context.OrderLineItem.Add(orderLineItem);
+            _context.orderLineItem.Add(orderLineItem);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetOrderLineItem", new { id = orderLineItem.OrderLineItemId }, orderLineItem);
@@ -87,13 +87,13 @@ namespace RiversideFishhut.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrderLineItem(int id)
         {
-            var orderLineItem = await _context.OrderLineItem.FindAsync(id);
+            var orderLineItem = await _context.orderLineItem.FindAsync(id);
             if (orderLineItem == null)
             {
                 return NotFound();
             }
 
-            _context.OrderLineItem.Remove(orderLineItem);
+            _context.orderLineItem.Remove(orderLineItem);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -101,7 +101,7 @@ namespace RiversideFishhut.API.Controllers
 
         private bool OrderLineItemExists(int id)
         {
-            return _context.OrderLineItem.Any(e => e.OrderLineItemId == id);
+            return _context.orderLineItem.Any(e => e.OrderLineItemId == id);
         }
     }
 }

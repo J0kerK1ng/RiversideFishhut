@@ -18,6 +18,8 @@ namespace RiversideFishhut.API.Data
         public DbSet<WebsiteInfo> websiteInfos { get; set; }
         public DbSet<OrderType> orderType { get; set; }
         public DbSet<OrderStatus> orderStatus { get; set; }
+        public DbSet<Order> order { get; set; }
+        public DbSet<OrderLineItem> orderLineItem { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -155,8 +157,5 @@ namespace RiversideFishhut.API.Data
                 );
         }
 
-        public DbSet<RiversideFishhut.API.Data.Order> Order { get; set; }
-
-        public DbSet<RiversideFishhut.API.Data.OrderLineItem> OrderLineItem { get; set; }
     }
 }

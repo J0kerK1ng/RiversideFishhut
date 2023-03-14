@@ -24,14 +24,14 @@ namespace RiversideFishhut.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrder()
         {
-            return await _context.Order.ToListAsync();
+            return await _context.order.ToListAsync();
         }
 
         // GET: api/Orders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
-            var order = await _context.Order.FindAsync(id);
+            var order = await _context.order.FindAsync(id);
 
             if (order == null)
             {
@@ -77,7 +77,7 @@ namespace RiversideFishhut.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
-            _context.Order.Add(order);
+            _context.order.Add(order);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetOrder", new { id = order.OrderId }, order);
@@ -87,13 +87,13 @@ namespace RiversideFishhut.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(int id)
         {
-            var order = await _context.Order.FindAsync(id);
+            var order = await _context.order.FindAsync(id);
             if (order == null)
             {
                 return NotFound();
             }
 
-            _context.Order.Remove(order);
+            _context.order.Remove(order);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -101,7 +101,7 @@ namespace RiversideFishhut.API.Controllers
 
         private bool OrderExists(int id)
         {
-            return _context.Order.Any(e => e.OrderId == id);
+            return _context.order.Any(e => e.OrderId == id);
         }
     }
 }
