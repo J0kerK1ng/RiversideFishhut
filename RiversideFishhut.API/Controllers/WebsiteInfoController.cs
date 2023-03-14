@@ -9,8 +9,8 @@ using RiversideFishhut.API.Data;
 
 namespace RiversideFishhut.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+	[Route("api/website-info/[controller]")]
+	[ApiController]
     public class WebsiteInfoController : ControllerBase
     {
         private readonly RiversideFishhutDbContext _context;
@@ -92,7 +92,7 @@ namespace RiversideFishhut.API.Controllers
             var websiteInfo = await _context.websiteInfos.FindAsync(id);
             if (websiteInfo == null)
             {
-                return NotFound();
+                return NotFound("Invalid Id");
             }
 
             _context.websiteInfos.Remove(websiteInfo);

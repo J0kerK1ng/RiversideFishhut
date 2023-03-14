@@ -13,10 +13,12 @@ namespace RiversideFishhut.API.Data
         public virtual IList<Product> Products { get; set;}
 
 
-        [ForeignKey(nameof(foodTypeTypeId))]
-        public int foodTypeTypeId{ get; set; }
+		[ForeignKey(nameof(FoodTypeId))]
+		public int FoodTypeId { get; set; }
 
-        public FoodType foodType { get; set; }
+		public FoodType foodType { get; set; }
 
-    }
+		public virtual ICollection<CategoryFoodType> CategoryFoodTypes { get; set; }
+
+	}
 }

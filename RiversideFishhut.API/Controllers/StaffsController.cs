@@ -9,100 +9,129 @@ using RiversideFishhut.API.Data;
 
 namespace RiversideFishhut.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class StaffsController : ControllerBase
-    {
-        private readonly RiversideFishhutDbContext _context;
+	[Route("api/[controller]")]
+	[ApiController]
+	public class StaffsController : ControllerBase
+	{
+		private readonly RiversideFishhutDbContext _context;
 
-        public StaffsController(RiversideFishhutDbContext context)
-        {
-            _context = context;
-        }
+		public StaffsController(RiversideFishhutDbContext context)
+		{
+			_context = context;
+		}
 
-        // GET: api/Staffs
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Staff>>> Getstaffs()
-        {
-            var staff = await _context.staffs.ToListAsync();
-            return Ok(staff); 
-        }
+		// GET: api/staffs
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<object>>> GetStaffs()
+		{
+			// return only the required fields using anonymous type
+			return await _context.staffs
+				.Select(s => new { s.StaffId, s.roleId, s.StaffName })
+				.ToListAsync();
+		}
 
-        // GET: api/Staffs/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Staff>> GetStaff(int id)
-        {
-            var staff = await _context.staffs.FindAsync(id);
+		// GET: api/staff-roles
+		[HttpGet("staff-roles")]
+		public async Task<ActionResult<IEnumerable<object>>> GetStaffRoles()
+		{
+			// join the staffs and roles tables and select only the required fields using anonymous type
+			return await _context.staffs
+				.Join(_context.staffs, s => s.roleId, r => r.roleId, (s, r) => new { s.StaffId, s.StaffName, r.Description })
+				.ToListAsync();
+		}
 
-            if (staff == null)
-            {
-                return NotFound();
-            }
+		// POST: api/staff-roles
+		[HttpPost("staff-roles")]
+		public async Task<ActionResult<object>> PostStaffRole(Staff staff)
+		{
+			// add the new staff to the database and save changes
+			_context.staffs.Add(staff);
+			await _context.SaveChangesAsync();
 
-            return staff;
-        }
+			// retrieve the new staff with the role description and return only the required fields using anonymous type
+			var result = await _context.staffs
+				.Join(_context.staffs, s => s.roleId, r => r.roleId, (s, r) => new { s.StaffId, s.roleId, s.StaffName, r.Description })
+				.SingleAsync(s => s.StaffId == staff.StaffId);
 
-        // PUT: api/Staffs/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutStaff(int id, Staff staff)
-        {
-            if (id != staff.StaffId)
-            {
-                return BadRequest();
-            }
+			return result;
+		}
 
-            _context.Entry(staff).State = EntityState.Modified;
+		// GET: api/staffs/5
+		[HttpGet("{id}")]
+		public async Task<ActionResult<object>> GetStaff(int id)
+		{
+			// retrieve the staff with the given id and return only the required fields using anonymous type
+			var staff = await _context.staffs
+				.Select(s => new { s.StaffId, s.roleId, s.StaffName })
+				.FirstOrDefaultAsync(s => s.StaffId == id);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StaffExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+			if (staff == null)
+			{
+				return NotFound();
+			}
 
-            return NoContent();
-        }
+			return staff;
+		}
 
-        // POST: api/Staffs
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Staff>> PostStaff(Staff staff)
-        {
-            _context.staffs.Add(staff);
-            await _context.SaveChangesAsync();
+		// PUT: api/staffs/5
+		[HttpPut("{id}")]
+		public async Task<IActionResult> PutStaff(int id, Staff staff)
+		{
+			// retrieve the staff with the given id and update the StaffName and Password properties
+			var existingStaff = await _context.staffs.FindAsync(id);
+			if (existingStaff == null)
+			{
+				return NotFound();
+			}
 
-            return CreatedAtAction("GetStaff", new { id = staff.StaffId }, staff);
-        }
+			existingStaff.StaffName = staff.StaffName;
+			existingStaff.Password = staff.Password;
 
-        // DELETE: api/Staffs/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStaff(int id)
-        {
-            var staff = await _context.staffs.FindAsync(id);
-            if (staff == null)
-            {
-                return NotFound("Invalid Id");
-            }
+			_context.Entry(existingStaff).State = EntityState.Modified;
 
-            _context.staffs.Remove(staff);
-            await _context.SaveChangesAsync();
+			try
+			{
+				await _context.SaveChangesAsync();
+			}
+			catch (DbUpdateConcurrencyException)
+			{
+				if (!StaffExists(id))
+				{
+					return NotFound();
+				}
+				else
+				{
+					throw;
+				}
+			}
 
-            return NoContent();
-        }
+			return Ok(new { status = "Success", message = $"Staff with id {id} updated successfully" });
+		}
 
-        private bool StaffExists(int id)
-        {
-            return _context.staffs.Any(e => e.StaffId == id);
-        }
-    }
+		// DELETE: api/staffs/5
+		[HttpDelete("{id}")]
+		public async Task<IActionResult> DeleteStaff(int id)
+		{
+			// retrieve the staff with the given id and remove it from the database
+			var staff = await _context.staffs.FindAsync(id);
+			if (staff == null)
+			{
+				return NotFound();
+			}
+
+			_context.staffs.Remove(staff);
+			await _context.SaveChangesAsync();
+
+			return NoContent();
+		}
+
+		private bool StaffExists(int id)
+		{
+			return _context.staffs.Any(e => e.StaffId == id);
+		}
+	}
 }
+
+
+
+

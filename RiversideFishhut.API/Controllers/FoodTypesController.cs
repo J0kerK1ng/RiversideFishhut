@@ -9,100 +9,98 @@ using RiversideFishhut.API.Data;
 
 namespace RiversideFishhut.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class FoodTypesController : ControllerBase
-    {
-        private readonly RiversideFishhutDbContext _context;
+	[Route("api/[controller]")]
+	[ApiController]
+	public class FoodTypesController : ControllerBase
+	{
+		private readonly RiversideFishhutDbContext _context;
 
-        public FoodTypesController(RiversideFishhutDbContext context)
-        {
-            _context = context;
-        }
+		public FoodTypesController(RiversideFishhutDbContext context)
+		{
+			_context = context;
+		}
 
-        // GET: api/FoodTypes
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<FoodType>>> GetfoodTypes()
-        {
-            var foodtype = await _context.foodTypes.ToListAsync();
-            return Ok(foodtype);
-        }
+		// GET: api/FoodTypes
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<object>>> GetFoodTypes()
+		{
+			// return only the required fields using anonymous type
+			return await _context.foodTypes
+				.Select(f => new { f.TypeId, f.TypeName, f.Description })
+				.ToListAsync();
+		}
 
-        // GET: api/FoodTypes/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<FoodType>> GetFoodType(int id)
-        {
-            var foodType = await _context.foodTypes.FindAsync(id);
+		// POST: api/FoodTypes
+		[HttpPost]
+		public async Task<ActionResult<object>> PostFoodType(FoodType foodType)
+		{
+			// add the new food type to the database and save changes
+			_context.foodTypes.Add(foodType);
+			await _context.SaveChangesAsync();
 
-            if (foodType == null)
-            {
-                return NotFound();
-            }
+			// retrieve the new food type and return only the required fields using anonymous type
+			var result = await _context.foodTypes
+				.Select(f => new { f.TypeId, f.TypeName, f.Description })
+				.SingleAsync(f => f.TypeId == foodType.TypeId);
 
-            return foodType;
-        }
+			return result;
+		}
 
-        // PUT: api/FoodTypes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutFoodType(int id, FoodType foodType)
-        {
-            if (id != foodType.TypeId)
-            {
-                return BadRequest();
-            }
+		// PUT: api/FoodTypes/5
+		[HttpPut("{id}")]
+		public async Task<IActionResult> PutFoodType(int id, FoodType foodType)
+		{
+			// retrieve the food type with the given id and update the TypeName and Description properties
+			var existingFoodType = await _context.foodTypes.FindAsync(id);
+			if (existingFoodType == null)
+			{
+				return NotFound();
+			}
 
-            _context.Entry(foodType).State = EntityState.Modified;
+			existingFoodType.TypeName = foodType.TypeName;
+			existingFoodType.Description = foodType.Description;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!FoodTypeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+			_context.Entry(existingFoodType).State = EntityState.Modified;
 
-            return NoContent();
-        }
+			try
+			{
+				await _context.SaveChangesAsync();
+			}
+			catch (DbUpdateConcurrencyException)
+			{
+				if (!FoodTypeExists(id))
+				{
+					return NotFound();
+				}
+				else
+				{
+					throw;
+				}
+			}
 
-        // POST: api/FoodTypes
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<FoodType>> PostFoodType(FoodType foodType)
-        {
-            _context.foodTypes.Add(foodType);
-            await _context.SaveChangesAsync();
+			return Ok(new { status = "Success", message = $"FoodType with id {id} updated successfully" });
+		}
 
-            return CreatedAtAction("GetFoodType", new { id = foodType.TypeId }, foodType);
-        }
+		// DELETE: api/FoodTypes/5
+		[HttpDelete("{id}")]
+		public async Task<IActionResult> DeleteFoodType(int id)
+		{
+			// retrieve the food type with the given id and remove it from the database
+			var foodType = await _context.foodTypes.FindAsync(id);
+			if (foodType == null)
+			{
+				return NotFound();
+			}
 
-        // DELETE: api/FoodTypes/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFoodType(int id)
-        {
-            var foodType = await _context.foodTypes.FindAsync(id);
-            if (foodType == null)
-            {
-                return NotFound("Invalid Id");
-            }
+			_context.foodTypes.Remove(foodType);
+			await _context.SaveChangesAsync();
 
-            _context.foodTypes.Remove(foodType);
-            await _context.SaveChangesAsync();
+			return NoContent();
+		}
 
-            return NoContent();
-        }
-
-        private bool FoodTypeExists(int id)
-        {
-            return _context.foodTypes.Any(e => e.TypeId == id);
-        }
-    }
+		private bool FoodTypeExists(int id)
+		{
+			return _context.foodTypes.Any(e => e.TypeId == id);
+		}
+	}
 }

@@ -10,5 +10,7 @@ namespace RiversideFishhut.API.Data
         public string Description { get; set; }
 
         public virtual IList<Category> Categories { get; set; }
-    }
+
+		public virtual ICollection<CategoryFoodType> CategoryFoodTypes { get; set; }
+	}
 }
