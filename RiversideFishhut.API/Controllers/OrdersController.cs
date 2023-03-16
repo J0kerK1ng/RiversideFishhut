@@ -27,6 +27,14 @@ namespace RiversideFishhut.API.Controllers
             return await _context.order.ToListAsync();
         }
 
+
+        // GET: api/Orders
+        [HttpGet("Recent5")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetRecent5Orders()
+        {
+            return await _context.order.OrderByDescending(o => o.OrderId).Take(5).ToListAsync();
+        }
+
         // GET: api/Orders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)

@@ -14,6 +14,8 @@ namespace RiversideFishhut.API.Data
 
         public OrderType OrderType { get; set; }
 
+        public string? table { get; set; }
+
         public string? notes { get; set; }
 
         [ForeignKey(nameof(StaffId))]

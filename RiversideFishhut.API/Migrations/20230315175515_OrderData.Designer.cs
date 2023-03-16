@@ -12,8 +12,8 @@ using RiversideFishhut.API.Data;
 namespace RiversideFishhut.API.Migrations
 {
     [DbContext(typeof(RiversideFishhutDbContext))]
-    [Migration("20230313184638_Initial")]
-    partial class Initial
+    [Migration("20230315175515_OrderData")]
+    partial class OrderData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -148,6 +148,9 @@ namespace RiversideFishhut.API.Migrations
                     b.Property<string>("notes")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("table")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("OrderId");
 
                     b.HasIndex("OrderTypeId");
@@ -155,6 +158,62 @@ namespace RiversideFishhut.API.Migrations
                     b.HasIndex("StaffId");
 
                     b.ToTable("order");
+
+                    b.HasData(
+                        new
+                        {
+                            OrderId = 1,
+                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3552),
+                            OrderStatusId = 1,
+                            OrderTypeId = 1,
+                            PaymentStatus = false,
+                            StaffId = 1
+                        },
+                        new
+                        {
+                            OrderId = 2,
+                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3581),
+                            OrderStatusId = 4,
+                            OrderTypeId = 2,
+                            PaymentStatus = true,
+                            StaffId = 2
+                        },
+                        new
+                        {
+                            OrderId = 3,
+                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3583),
+                            OrderStatusId = 2,
+                            OrderTypeId = 1,
+                            PaymentStatus = false,
+                            StaffId = 1
+                        },
+                        new
+                        {
+                            OrderId = 4,
+                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3585),
+                            OrderStatusId = 1,
+                            OrderTypeId = 1,
+                            PaymentStatus = false,
+                            StaffId = 1
+                        },
+                        new
+                        {
+                            OrderId = 5,
+                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3586),
+                            OrderStatusId = 1,
+                            OrderTypeId = 1,
+                            PaymentStatus = false,
+                            StaffId = 1
+                        },
+                        new
+                        {
+                            OrderId = 6,
+                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3588),
+                            OrderStatusId = 2,
+                            OrderTypeId = 3,
+                            PaymentStatus = true,
+                            StaffId = 2
+                        });
                 });
 
             modelBuilder.Entity("RiversideFishhut.API.Data.OrderLineItem", b =>

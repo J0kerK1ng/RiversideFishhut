@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RiversideFishhut.API.Data;
 
@@ -11,9 +12,10 @@ using RiversideFishhut.API.Data;
 namespace RiversideFishhut.API.Migrations
 {
     [DbContext(typeof(RiversideFishhutDbContext))]
-    partial class RiversideFishhutDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230315173545_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,7 +46,7 @@ namespace RiversideFishhut.API.Migrations
 
                     b.HasKey("AdminId");
 
-                    b.ToTable("admins", (string)null);
+                    b.ToTable("admins");
 
                     b.HasData(
                         new
@@ -79,7 +81,7 @@ namespace RiversideFishhut.API.Migrations
 
                     b.HasIndex("foodTypeTypeId");
 
-                    b.ToTable("categories", (string)null);
+                    b.ToTable("categories");
 
                     b.HasData(
                         new
@@ -109,7 +111,7 @@ namespace RiversideFishhut.API.Migrations
 
                     b.HasKey("TypeId");
 
-                    b.ToTable("foodTypes", (string)null);
+                    b.ToTable("foodTypes");
 
                     b.HasData(
                         new
@@ -155,63 +157,7 @@ namespace RiversideFishhut.API.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("order", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            OrderId = 1,
-                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3552),
-                            OrderStatusId = 1,
-                            OrderTypeId = 1,
-                            PaymentStatus = false,
-                            StaffId = 1
-                        },
-                        new
-                        {
-                            OrderId = 2,
-                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3581),
-                            OrderStatusId = 4,
-                            OrderTypeId = 2,
-                            PaymentStatus = true,
-                            StaffId = 2
-                        },
-                        new
-                        {
-                            OrderId = 3,
-                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3583),
-                            OrderStatusId = 2,
-                            OrderTypeId = 1,
-                            PaymentStatus = false,
-                            StaffId = 1
-                        },
-                        new
-                        {
-                            OrderId = 4,
-                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3585),
-                            OrderStatusId = 1,
-                            OrderTypeId = 1,
-                            PaymentStatus = false,
-                            StaffId = 1
-                        },
-                        new
-                        {
-                            OrderId = 5,
-                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3586),
-                            OrderStatusId = 1,
-                            OrderTypeId = 1,
-                            PaymentStatus = false,
-                            StaffId = 1
-                        },
-                        new
-                        {
-                            OrderId = 6,
-                            OrderDate = new DateTime(2023, 3, 15, 13, 55, 15, 629, DateTimeKind.Local).AddTicks(3588),
-                            OrderStatusId = 2,
-                            OrderTypeId = 3,
-                            PaymentStatus = true,
-                            StaffId = 2
-                        });
+                    b.ToTable("order");
                 });
 
             modelBuilder.Entity("RiversideFishhut.API.Data.OrderLineItem", b =>
@@ -233,7 +179,7 @@ namespace RiversideFishhut.API.Migrations
 
                     b.HasKey("OrderLineItemId");
 
-                    b.ToTable("orderLineItem", (string)null);
+                    b.ToTable("orderLineItem");
                 });
 
             modelBuilder.Entity("RiversideFishhut.API.Data.OrderStatus", b =>
@@ -250,7 +196,7 @@ namespace RiversideFishhut.API.Migrations
 
                     b.HasKey("OrderStatusId");
 
-                    b.ToTable("orderStatus", (string)null);
+                    b.ToTable("orderStatus");
 
                     b.HasData(
                         new
@@ -289,7 +235,7 @@ namespace RiversideFishhut.API.Migrations
 
                     b.HasKey("OrderTypeId");
 
-                    b.ToTable("orderType", (string)null);
+                    b.ToTable("orderType");
 
                     b.HasData(
                         new
@@ -334,7 +280,7 @@ namespace RiversideFishhut.API.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("products", (string)null);
+                    b.ToTable("products");
 
                     b.HasData(
                         new
@@ -393,7 +339,7 @@ namespace RiversideFishhut.API.Migrations
 
                     b.HasKey("StaffId");
 
-                    b.ToTable("staffs", (string)null);
+                    b.ToTable("staffs");
 
                     b.HasData(
                         new
@@ -446,7 +392,7 @@ namespace RiversideFishhut.API.Migrations
 
                     b.HasKey("InfoId");
 
-                    b.ToTable("websiteInfos", (string)null);
+                    b.ToTable("websiteInfos");
 
                     b.HasData(
                         new

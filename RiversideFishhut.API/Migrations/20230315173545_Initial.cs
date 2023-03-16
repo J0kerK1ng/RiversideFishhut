@@ -140,6 +140,7 @@ namespace RiversideFishhut.API.Migrations
                     OrderId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OrderTypeId = table.Column<int>(type: "int", nullable: false),
+                    table = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StaffId = table.Column<int>(type: "int", nullable: false),
                     OrderStatusId = table.Column<int>(type: "int", nullable: false),

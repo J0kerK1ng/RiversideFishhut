@@ -155,6 +155,63 @@ namespace RiversideFishhut.API.Data
                     OrderStatusName = "Complete"
                 }
                 );
+            modelBuilder.Entity<Order>().HasData(
+                new Order
+                {
+                    OrderId = 1,
+                    OrderTypeId = 1,
+                    StaffId = 1,
+                    OrderStatusId = 1,
+                    PaymentStatus = false,
+                    OrderDate = DateTime.Now
+                },
+                new Order
+                {
+                    OrderId = 2,
+                    OrderTypeId = 2,
+                    StaffId = 2,
+                    OrderStatusId = 4,
+                    PaymentStatus = true,
+                    OrderDate = DateTime.Now
+                },
+                new Order
+                {
+                    OrderId = 3,
+                    OrderTypeId = 1,
+                    StaffId = 1,
+                    OrderStatusId = 2,
+                    PaymentStatus = false,
+                    OrderDate = DateTime.Now
+                },
+                new Order
+                {
+                    OrderId = 4,
+                    OrderTypeId = 1,
+                    StaffId = 1,
+                    OrderStatusId = 1,
+                    PaymentStatus = false,
+                    OrderDate = DateTime.Now
+                },
+                new Order
+                {
+                    OrderId = 5,
+                    OrderTypeId = 1,
+                    StaffId = 1,
+                    OrderStatusId = 1,
+                    PaymentStatus = false,
+                    OrderDate = DateTime.Now
+                },
+                new Order
+                {
+                    OrderId = 6,
+                    OrderTypeId = 3,
+                    StaffId = 2,
+                    OrderStatusId = 2,
+                    PaymentStatus = true,
+                    OrderDate = DateTime.Now
+                }
+                );
+
         }
 
     }
