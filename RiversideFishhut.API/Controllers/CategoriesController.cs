@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using RiversideFishhut.API.Data;
 
 namespace RiversideFishhut.API.Controllers
 {
-	[Route("api/[controller]")]
+	[Route("api/product-categories")]
 	[ApiController]
 	public class CategoriesController : ControllerBase
 	{
@@ -20,43 +21,50 @@ namespace RiversideFishhut.API.Controllers
 
 		// GET: api/Categories
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+		public async Task<ActionResult<CustomResponse>> GetCategories()
 		{
-			return await _context.categories.Include(c => c.Products).ToListAsync();
+			try
+			{
+				var categories = await _context.categories.Include(c => c.Products).ToListAsync();
+				return new CustomResponse(200, "Successfully", categories);
+			}
+			catch (Exception ex)
+			{
+				
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
 		}
 
 		// GET: api/Categories/5
 		[HttpGet("{id}")]
-		public async Task<ActionResult<Category>> GetCategory(int id)
+		public async Task<ActionResult<CustomResponse>> GetCategory(int id)
 		{
-			var category = await _context.categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.CategoryId == id);
-
-			if (category == null)
+			try
 			{
-				return NotFound();
-			}
+				var category = await _context.categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.CategoryId == id);
 
-			return category;
+				if (category == null)
+				{
+					return NotFound(new CustomResponse(404, "Not Found", null));
+				}
+
+				return new CustomResponse(200, "Successfully", category);
+			}
+			catch (Exception ex)
+			{
+				
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
 		}
 
 		// PUT: api/Categories/5
-		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 		[HttpPut("{id}")]
-		public async Task<IActionResult> PutCategory(int id, Category category)
+		public async Task<ActionResult<CustomResponse>> PutCategory(int id, Category category)
 		{
 			if (id != category.CategoryId)
 			{
-				return BadRequest();
+				return BadRequest(new CustomResponse(400, "Bad Request", null));
 			}
-
-			var foodType = await _context.foodTypes.FindAsync(category.FoodTypeId);
-
-			if (foodType == null)
-			{
-				return BadRequest("Invalid FoodType Id");
-			}
-
-			category.foodType = foodType;
 
 			_context.Entry(category).State = EntityState.Modified;
 
@@ -68,53 +76,62 @@ namespace RiversideFishhut.API.Controllers
 			{
 				if (!CategoryExists(id))
 				{
-					return NotFound();
+					return NotFound(new CustomResponse(404, "Not Found", null));
 				}
 				else
 				{
 					throw;
 				}
 			}
-
-			return NoContent();
-		}
-
-
-		// POST: api/Categories
-		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-		[HttpPost]
-		public async Task<ActionResult<Category>> PostCategory(Category category)
-		{
-			var foodType = await _context.foodTypes.FindAsync(category.FoodTypeId);
-
-			if (foodType == null)
+			catch (Exception ex)
 			{
-				return BadRequest("Invalid FoodType Id");
+				
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
 			}
 
-			category.foodType = foodType;
-
-			_context.categories.Add(category);
-			await _context.SaveChangesAsync();
-
-			return CreatedAtAction("GetCategory", new { id = category.CategoryId }, category);
+			return new CustomResponse(200, "Successfully", null);
 		}
 
+		// POST: api/Categories
+		[HttpPost]
+		public async Task<ActionResult<CustomResponse>> PostCategory(Category category)
+		{
+			try
+			{
+				_context.categories.Add(category);
+				await _context.SaveChangesAsync();
+			}
+			catch (Exception ex)
+			{
+				
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
+
+			return CreatedAtAction(nameof(GetCategory), new { id = category.CategoryId }, new CustomResponse(200, "Successfully", category));
+		}
 
 		// DELETE: api/Categories/5
 		[HttpDelete("{id}")]
-		public async Task<IActionResult> DeleteCategory(int id)
+		public async Task<ActionResult<CustomResponse>> DeleteCategory(int id)
 		{
 			var category = await _context.categories.FindAsync(id);
 			if (category == null)
 			{
-				return NotFound();
+				return NotFound(new CustomResponse(404, "Not Found", null));
 			}
 
-			_context.categories.Remove(category);
-			await _context.SaveChangesAsync();
+			try
+			{
+				_context.categories.Remove(category);
+				await _context.SaveChangesAsync();
+			}
+			catch (Exception ex)
+			{
+				
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
 
-			return NoContent();
+			return new CustomResponse(200, "Successfully", null);
 		}
 
 		private bool CategoryExists(int id)
@@ -123,4 +140,6 @@ namespace RiversideFishhut.API.Controllers
 		}
 	}
 }
+
+
 

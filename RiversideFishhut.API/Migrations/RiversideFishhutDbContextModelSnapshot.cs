@@ -29,7 +29,7 @@ namespace RiversideFishhut.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AdminId"), 1L, 1);
 
-                    b.Property<string>("AdminAddress")
+                    b.Property<string>("AdminEmailAddress")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -41,7 +41,12 @@ namespace RiversideFishhut.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
                     b.HasKey("AdminId");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("admins");
 
@@ -49,9 +54,10 @@ namespace RiversideFishhut.API.Migrations
                         new
                         {
                             AdminId = 1,
-                            AdminAddress = "Admin@gmail.com",
+                            AdminEmailAddress = "Admin@gmail.com",
                             AdminName = "Admin",
-                            AdminPassword = "Admin123"
+                            AdminPassword = "Admin123",
+                            RoleId = 1
                         });
                 });
 
@@ -63,11 +69,11 @@ namespace RiversideFishhut.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BusinessHourId"), 1L, 1);
 
-                    b.Property<string>("businessTime")
+                    b.Property<string>("BusinessTime")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("dayOfWeek")
+                    b.Property<string>("DayOfWeek")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -79,8 +85,8 @@ namespace RiversideFishhut.API.Migrations
                         new
                         {
                             BusinessHourId = 1,
-                            businessTime = "09:00 - 17:00",
-                            dayOfWeek = "Monday"
+                            BusinessTime = "09:00 - 17:00",
+                            DayOfWeek = "Monday"
                         });
                 });
 
@@ -96,16 +102,11 @@ namespace RiversideFishhut.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("FoodTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TypeName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CategoryId");
-
-                    b.HasIndex("FoodTypeId");
 
                     b.ToTable("categories");
 
@@ -114,30 +115,7 @@ namespace RiversideFishhut.API.Migrations
                         {
                             CategoryId = 1,
                             Description = "Main Dish",
-                            FoodTypeId = 1,
-                            TypeName = "2 PC Dinner"
-                        });
-                });
-
-            modelBuilder.Entity("RiversideFishhut.API.Data.CategoryFoodType", b =>
-                {
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FoodTypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CategoryId", "FoodTypeId");
-
-                    b.HasIndex("FoodTypeId");
-
-                    b.ToTable("CategoryFoodTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            CategoryId = 1,
-                            FoodTypeId = 1
+                            Name = "2 PC Dinner"
                         });
                 });
 
@@ -153,11 +131,16 @@ namespace RiversideFishhut.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
                     b.Property<string>("TypeName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("TypeId");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("foodTypes");
 
@@ -166,25 +149,8 @@ namespace RiversideFishhut.API.Migrations
                         {
                             TypeId = 1,
                             Description = "This type is for 2 Pc fish with 1 pack chip.",
+                            ProductId = 1,
                             TypeName = "2 PC Dinner"
-                        },
-                        new
-                        {
-                            TypeId = 2,
-                            Description = "Description for FoodType2",
-                            TypeName = "FoodType2"
-                        },
-                        new
-                        {
-                            TypeId = 3,
-                            Description = "Description for FoodType3",
-                            TypeName = "FoodType3"
-                        },
-                        new
-                        {
-                            TypeId = 4,
-                            Description = "Description for FoodType4",
-                            TypeName = "FoodType4"
                         });
                 });
 
@@ -196,18 +162,22 @@ namespace RiversideFishhut.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"), 1L, 1);
 
+                    b.Property<string>("AltName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Dine_in_price")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Dine_in_price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Take_out_price")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Take_out_price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("ProductId");
 
@@ -219,34 +189,73 @@ namespace RiversideFishhut.API.Migrations
                         new
                         {
                             ProductId = 1,
+                            AltName = "2 PC W/C",
                             CategoryId = 1,
-                            Dine_in_price = 10,
+                            Dine_in_price = 10m,
                             ProductName = "2Pc Whitefish & Chips",
-                            Take_out_price = 9
+                            Take_out_price = 9m
                         },
                         new
                         {
                             ProductId = 2,
+                            AltName = "2 PC COD/C",
                             CategoryId = 1,
-                            Dine_in_price = 12,
+                            Dine_in_price = 12m,
                             ProductName = "2Pc Cod & Chips",
-                            Take_out_price = 11
+                            Take_out_price = 11m
                         },
                         new
                         {
                             ProductId = 3,
+                            AltName = "2 PC HDK/C",
                             CategoryId = 1,
-                            Dine_in_price = 14,
+                            Dine_in_price = 14m,
                             ProductName = "2Pc Haddock & Chips",
-                            Take_out_price = 13
+                            Take_out_price = 13m
                         },
                         new
                         {
                             ProductId = 4,
+                            AltName = "2PC HB/C",
                             CategoryId = 1,
-                            Dine_in_price = 16,
+                            Dine_in_price = 16m,
                             ProductName = "2Pc Halibut & Chips",
-                            Take_out_price = 15
+                            Take_out_price = 15m
+                        });
+                });
+
+            modelBuilder.Entity("RiversideFishhut.API.Data.Role", b =>
+                {
+                    b.Property<int>("RoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"), 1L, 1);
+
+                    b.Property<string>("RoleDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RoleId");
+
+                    b.ToTable("roles");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1,
+                            RoleDescription = "Administrator",
+                            RoleName = "Admin"
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            RoleDescription = "Staff member",
+                            RoleName = "Staff"
                         });
                 });
 
@@ -266,15 +275,16 @@ namespace RiversideFishhut.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("StaffName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("roleId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("StaffId");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("staffs");
 
@@ -284,16 +294,16 @@ namespace RiversideFishhut.API.Migrations
                             StaffId = 1,
                             Description = "description1",
                             Password = "Password1",
-                            StaffName = "Staff 1",
-                            roleId = "Admin"
+                            RoleId = 1,
+                            StaffName = "Staff 1"
                         },
                         new
                         {
                             StaffId = 2,
                             Description = "description2",
                             Password = "Password2",
-                            StaffName = "Staff 2",
-                            roleId = "Staff"
+                            RoleId = 2,
+                            StaffName = "Staff 2"
                         });
                 });
 
@@ -313,11 +323,15 @@ namespace RiversideFishhut.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("LogoImage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("OnlineOrderLink")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Phone")
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -335,65 +349,65 @@ namespace RiversideFishhut.API.Migrations
                             InfoId = 1,
                             Address = "157 king st west Cambridge, ON, N3H 1B5",
                             Description = "This cozy restaurant specializes in traditional English fish and French fries, serving up freshly fried, crispy and flavorful fish sourced from local suppliers, and thick golden fries that make the perfect side dish.",
+                            LogoImage = "Logo name",
                             OnlineOrderLink = "https://www.skipthedishes.com/riverside-fish-hut?utm_source=riversidefishhutmenu.ca&utm_medium=microsites&utm_campaign=microsites",
-                            Phone = "519-653-0788",
+                            PhoneNumber = "519-653-0788",
                             StoreName = "Riverside Fishhut"
                         });
                 });
 
-            modelBuilder.Entity("RiversideFishhut.API.Data.Category", b =>
+            modelBuilder.Entity("RiversideFishhut.API.Data.Admin", b =>
                 {
-                    b.HasOne("RiversideFishhut.API.Data.FoodType", "foodType")
-                        .WithMany("Categories")
-                        .HasForeignKey("FoodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("RiversideFishhut.API.Data.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("foodType");
+                    b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("RiversideFishhut.API.Data.CategoryFoodType", b =>
+            modelBuilder.Entity("RiversideFishhut.API.Data.FoodType", b =>
                 {
-                    b.HasOne("RiversideFishhut.API.Data.Category", "Category")
-                        .WithMany("CategoryFoodTypes")
-                        .HasForeignKey("CategoryId")
+                    b.HasOne("RiversideFishhut.API.Data.Product", "Product")
+                        .WithMany("FoodTypes")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RiversideFishhut.API.Data.FoodType", "FoodType")
-                        .WithMany("CategoryFoodTypes")
-                        .HasForeignKey("FoodTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("FoodType");
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("RiversideFishhut.API.Data.Product", b =>
                 {
-                    b.HasOne("RiversideFishhut.API.Data.Category", "category")
+                    b.HasOne("RiversideFishhut.API.Data.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("category");
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("RiversideFishhut.API.Data.Staff", b =>
+                {
+                    b.HasOne("RiversideFishhut.API.Data.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("RiversideFishhut.API.Data.Category", b =>
                 {
-                    b.Navigation("CategoryFoodTypes");
-
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("RiversideFishhut.API.Data.FoodType", b =>
+            modelBuilder.Entity("RiversideFishhut.API.Data.Product", b =>
                 {
-                    b.Navigation("Categories");
-
-                    b.Navigation("CategoryFoodTypes");
+                    b.Navigation("FoodTypes");
                 });
 #pragma warning restore 612, 618
         }

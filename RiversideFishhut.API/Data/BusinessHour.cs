@@ -7,8 +7,8 @@ namespace RiversideFishhut.API.Data
 	{
 		[Key]
 		public int BusinessHourId { get; set; }
-		public string dayOfWeek { get; set; }
-		public string businessTime { get; set; }
+		public string DayOfWeek { get; set; }
+		public string BusinessTime { get; set; }
 
 		
 		
