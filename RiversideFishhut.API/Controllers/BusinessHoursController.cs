@@ -22,42 +22,40 @@ namespace RiversideFishhut.API.Controllers
 
 		// GET: api/business-hours
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<object>>> GetBusinessHours()
+		public async Task<ActionResult<CustomResponse>> GetBusinessHours()
 		{
-			// return only the required fields using anonymous type
-			return await _context.businessHours
-				.Select(b => new { b.BusinessHourId, b.dayOfWeek, b.businessTime })
-				.ToListAsync();
-		}
-
-		// GET: api/business-hours/5
-		[HttpGet("{id}")]
-		public async Task<ActionResult<BusinessHour>> GetBusinessHour(int id)
-		{
-			var businessHour = await _context.businessHours.FindAsync(id);
-
-			if (businessHour == null)
+			try
 			{
-				return NotFound();
-			}
+				var businessHours = await _context.businessHours
+					.Select(b => new
+					{
+						b.BusinessHourId,
+						b.DayOfWeek,
+						b.BusinessTime
+					})
+					.ToListAsync();
 
-			// return the full BusinessHour object
-			return businessHour;
+				return new CustomResponse(200, "Business hours retrieved successfully", businessHours);
+			}
+			catch (Exception ex)
+			{
+				// You can log the exception here if needed
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
 		}
 
 		// PUT: api/business-hours/5
-		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 		[HttpPut("{id}")]
-		public async Task<IActionResult> PutBusinessHour(int id, BusinessHour businessHour)
+		public async Task<ActionResult<CustomResponse>> PutBusinessHour(int id, BusinessHour businessHour)
 		{
 			if (id != businessHour.BusinessHourId)
 			{
-				return BadRequest();
+				return BadRequest(new CustomResponse(400, "Invalid record Id", null));
 			}
 
 			// only update the required fields
-			_context.Entry(businessHour).Property(b => b.dayOfWeek).IsModified = true;
-			_context.Entry(businessHour).Property(b => b.businessTime).IsModified = true;
+			_context.Entry(businessHour).Property(b => b.DayOfWeek).IsModified = true;
+			_context.Entry(businessHour).Property(b => b.BusinessTime).IsModified = true;
 
 			try
 			{
@@ -67,7 +65,7 @@ namespace RiversideFishhut.API.Controllers
 			{
 				if (!BusinessHourExists(id))
 				{
-					return NotFound();
+					return NotFound(new CustomResponse(404, "Business hour not found", null));
 				}
 				else
 				{
@@ -75,44 +73,13 @@ namespace RiversideFishhut.API.Controllers
 				}
 			}
 
-			// return only the updated fields
-			return Ok(new { businessHour.dayOfWeek, businessHour.businessTime });
-		}
-
-		// POST: api/business-hours
-		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-		[HttpPost]
-		public async Task<ActionResult<BusinessHour>> PostBusinessHour(BusinessHour businessHour)
-		{
-			_context.businessHours.Add(businessHour);
-			await _context.SaveChangesAsync();
-
-			// return only the required fields
-			return CreatedAtAction(nameof(GetBusinessHour), new { id = businessHour.BusinessHourId },
-				new { businessHour.BusinessHourId, businessHour.dayOfWeek, businessHour.businessTime });
-		}
-
-		// DELETE: api/business-hours/5
-		[HttpDelete("{id}")]
-		public async Task<IActionResult> DeleteBusinessHour(int id)
-		{
-			var businessHour = await _context.businessHours.FindAsync(id);
-			if (businessHour == null)
-			{
-				return NotFound();
-			}
-
-			_context.businessHours.Remove(businessHour);
-			await _context.SaveChangesAsync();
-
-			return NoContent();
+			return new CustomResponse(200, "Business hour updated successfully", null);
 		}
 
 		private bool BusinessHourExists(int id)
 		{
 			return _context.businessHours.Any(e => e.BusinessHourId == id);
 		}
-
 	}
 }
 

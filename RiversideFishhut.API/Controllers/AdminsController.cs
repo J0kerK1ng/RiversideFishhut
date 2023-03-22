@@ -9,100 +9,76 @@ using RiversideFishhut.API.Data;
 
 namespace RiversideFishhut.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AdminsController : ControllerBase
-    {
-        private readonly RiversideFishhutDbContext _context;
+	[Route("api/[controller]")]
+	[ApiController]
+	public class AdminsController : ControllerBase
+	{
+		private readonly RiversideFishhutDbContext _context;
 
-        public AdminsController(RiversideFishhutDbContext context)
-        {
-            _context = context;
-        }
+		public AdminsController(RiversideFishhutDbContext context)
+		{
+			_context = context;
+		}
 
-        // GET: api/Admins
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Admin>>> Getadmins()
-        {
-            var admin = await _context.admins.ToListAsync();
-            return Ok(admin);
-        }
+		// POST: api/admins/login
+		[HttpPost("login")]
+		public async Task<ActionResult<object>> LoginAdmin([FromBody] dynamic data)
+		{
+			string adminName = data.AdminName;
+			string adminPassword = data.AdminPassword;
 
-        // GET: api/Admins/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Admin>> GetAdmin(int id)
-        {
-            var admin = await _context.admins.FindAsync(id);
+			var admin = await _context.admins
+				.Where(a => a.AdminName == adminName && a.AdminPassword == adminPassword)
+				.Select(a => new
+				{
+					a.AdminId,
+					a.AdminName,
+					a.AdminEmailAddress,
+					a.RoleId
+				})
+				.FirstOrDefaultAsync();
 
-            if (admin == null)
-            {
-                return NotFound();
-            }
+			if (admin == null)
+			{
+				return StatusCode(401, new { status = 401, message = "Invalid credentials" });
+			}
 
-            return admin;
-        }
+			return StatusCode(200, new
+			{
+				status = 200,
+				message = "Login successful",
+				data = new
+				{
+					user = admin
+				}
+			});
+		}
 
-        // PUT: api/Admins/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAdmin(int id, Admin admin)
-        {
-            if (id != admin.AdminId)
-            {
-                return BadRequest();
-            }
+		// POST: api/admins/forget-password
+		[HttpPost("forget-password")]
+		public async Task<ActionResult<object>> ForgetPassword([FromBody] dynamic data)
+		{
+			string adminName = data.AdminName;
 
-            _context.Entry(admin).State = EntityState.Modified;
+			var admin = await _context.admins
+				.Where(a => a.AdminName == adminName)
+				.FirstOrDefaultAsync();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AdminExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+			if (admin == null)
+			{
+				return StatusCode(404, new { status = 404, message = "Admin not found" });
+			}
 
-            return NoContent();
-        }
 
-        // POST: api/Admins
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Admin>> PostAdmin(Admin admin)
-        {
-            _context.admins.Add(admin);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetAdmin", new { id = admin.AdminId }, admin);
-        }
+				return StatusCode(200, new
+			{
+				status = 200,
+				message = $"Password reset instructions sent to {admin.AdminEmailAddress}",
+				data = (object)null
+			});
+		}
 
-        // DELETE: api/Admins/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAdmin(int id)
-        {
-            var admin = await _context.admins.FindAsync(id);
-            if (admin == null)
-            {
-                return NotFound("Invalid Id");
-            }
-
-            _context.admins.Remove(admin);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool AdminExists(int id)
-        {
-            return _context.admins.Any(e => e.AdminId == id);
-        }
-    }
+	}
 }
+

@@ -1,15 +1,27 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RiversideFishhut.API.Data
 {
-    public class Staff
-    {
-        [Key]
-        public int StaffId { get; set; }
-        public string roleId { get; set; }
-        public string StaffName { get; set; }
-        public string Description { get; set; }
-        public string Password { get; set; }
-    }
+	public class Staff
+	{
+		[Key]
+		public int StaffId { get; set; }
+
+		[Required]
+		public string StaffName { get; set; }
+
+		[Required]
+		public string Description { get; set; }
+
+		[Required]
+		public string Password { get; set; }
+
+		[Required]
+		[ForeignKey(nameof(RoleId))]
+		public int RoleId { get; set; }
+
+		public Role Role { get; set; }
+	}
 }
+

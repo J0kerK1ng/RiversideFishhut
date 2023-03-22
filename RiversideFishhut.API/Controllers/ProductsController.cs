@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RiversideFishhut.API.Data;
@@ -12,10 +11,6 @@ namespace RiversideFishhut.API.Controllers
 	[ApiController]
 	public class ProductsController : ControllerBase
 	{
-		private bool ProductExists(int id)
-		{
-			return _context.products.Any(e => e.ProductId == id);
-		}
 		private readonly RiversideFishhutDbContext _context;
 
 		public ProductsController(RiversideFishhutDbContext context)
@@ -23,138 +18,185 @@ namespace RiversideFishhut.API.Controllers
 			_context = context;
 		}
 
+		private bool ProductExists(int id)
+		{
+			return _context.products.Any(e => e.ProductId == id);
+		}
+
 		// GET: api/Products
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<object>>> Getproducts()
+		public async Task<ActionResult<CustomResponse>> Getproducts()
 		{
-			var products = await _context.products
-				.Include(p => p.category)
-				.Include(p => p.category.foodType)
-				.Select(p => new
-				{
-					p.ProductId,
-					p.ProductName,
-					p.Dine_in_price,
-					p.Take_out_price,
-					TypeName = p.category.foodType.TypeName
-				})
-				.ToListAsync();
-
-			return Ok(products);
-		}
-
-		// GET: api/Products/5
-		[HttpGet("{id}")]
-		public async Task<ActionResult<object>> GetProduct(int id)
-		{
-			var product = await _context.products
-				.Include(p => p.category)
-				.ThenInclude(c => c.foodType) // Add this line to include the FoodType through the Category
-				.Where(p => p.ProductId == id)
-				.Select(p => new
-				{
-					p.ProductId,
-					p.ProductName,
-					p.Dine_in_price,
-					p.Take_out_price,
-					TypeId = p.category.foodType.TypeId, // Change this line to access FoodType through the Category
-					TypeName = p.category.foodType.TypeName, // Change this line to access FoodType through the Category
-					p.category.CategoryId,
-					p.category.Description
-				})
-				.FirstOrDefaultAsync();
-
-			if (product == null)
-			{
-				return NotFound();
-			}
-
-			return product;
-		}
-
-		// PUT: api/Products/5
-		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-		[HttpPut("{id}")]
-		public async Task<IActionResult> PutProduct(int id, Product product)
-		{
-			if (id != product.ProductId)
-			{
-				return BadRequest();
-			}
-
-			_context.Entry(product).State = EntityState.Modified;
-
 			try
 			{
-				await _context.SaveChangesAsync();
-			}
-			catch (DbUpdateConcurrencyException)
-			{
-				if (!ProductExists(id))
-				{
-					return NotFound();
-				}
-				else
-				{
-					throw;
-				}
-			}
+				var products = await _context.products
+					.Include(p => p.Category)
+					.Include(p => p.FoodTypes)
+					.Select(p => new
+					{
+						p.ProductId,
+						p.ProductName,
+						p.Dine_in_price,
+						p.Take_out_price,
+						FoodTypes = p.FoodTypes.Select(ft => ft.TypeName).ToList(),
+						p.CategoryId
+					})
+					.ToListAsync();
 
-			return NoContent();
+				return new CustomResponse(200, "Successfully", products);
+			}
+			catch (Exception ex)
+			{
+				
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
 		}
 
 		// POST: api/Products
-		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 		[HttpPost]
-		public async Task<ActionResult<Product>> PostProduct(Product product)
+		public async Task<ActionResult<CustomResponse>> PostProduct([FromBody] Product product)
 		{
-			var category = await _context.categories
-				.FirstOrDefaultAsync(c => c.CategoryId == product.CategoryId);
-
-			if (category == null)
+			try
 			{
-				return BadRequest("Invalid Category Id");
+				var category = await _context.categories.FindAsync(product.Category.CategoryId);
+				if (category == null)
+				{
+					category = new Category
+					{
+						CategoryId = product.Category.CategoryId,
+						Name = product.Category.Name,
+						Description = product.Category.Description
+					};
+					_context.categories.Add(category);
+				}
+
+				product.CategoryId = category.CategoryId;
+
+				_context.products.Add(product);
+				await _context.SaveChangesAsync();
+
+				var responseData = new
+				{
+					product.ProductId,
+					product.ProductName,
+					product.AltName,
+					product.Dine_in_price,
+					product.Take_out_price,
+					FoodTypes = product.FoodTypes.Select(ft => new
+					{
+						ft.TypeId,
+						ft.TypeName,
+						ft.Description
+					}),
+					Category = new
+					{
+						product.Category.CategoryId,
+						product.Category.Name,
+						product.Category.Description
+					}
+				};
+
+				return StatusCode(201, new CustomResponse(201, "Successful", responseData));
 			}
-
-			var foodType = await _context.foodTypes
-				.FirstOrDefaultAsync(f => f.TypeId == category.FoodTypeId);
-
-			if (foodType == null)
+			catch (Exception ex)
 			{
-				return BadRequest("Invalid FoodType Id");
+				
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
 			}
-
-			product.category = category;
-
-			_context.products.Add(product);
-			await _context.SaveChangesAsync();
-
-			return CreatedAtAction("GetProduct", new { id = product.ProductId }, product);
 		}
+		[HttpPut("{id}")]
+		public async Task<ActionResult<CustomResponse>> PutProduct(int id, [FromBody] Product updatedProduct)
+		{
+			try
+			{
+				var product = await _context.products.Include(p => p.FoodTypes).FirstOrDefaultAsync(p => p.ProductId == id);
 
+				if (product == null)
+				{
+					return StatusCode(404, new CustomResponse(404, "Product not found", null));
+				}
 
+				var category = await _context.categories.FindAsync(updatedProduct.Category.CategoryId);
+				if (category == null)
+				{
+					category = new Category
+					{
+						CategoryId = updatedProduct.Category.CategoryId,
+						Name = updatedProduct.Category.Name,
+						Description = updatedProduct.Category.Description
+					};
+					_context.categories.Add(category);
+				}
 
+				product.ProductName = updatedProduct.ProductName;
+				product.AltName = updatedProduct.AltName;
+				product.Dine_in_price = updatedProduct.Dine_in_price;
+				product.Take_out_price = updatedProduct.Take_out_price;
+				product.CategoryId = category.CategoryId;
+
+				// Remove existing FoodTypes
+				_context.foodTypes.RemoveRange(product.FoodTypes);
+
+				// Add new FoodTypes
+				product.FoodTypes = updatedProduct.FoodTypes.Select(ft => new FoodType
+				{
+					TypeId = ft.TypeId,
+					TypeName = ft.TypeName,
+					Description = ft.Description
+				}).ToList();
+
+				_context.Entry(product).State = EntityState.Modified;
+				await _context.SaveChangesAsync();
+
+				var responseData = new
+				{
+					product.ProductId,
+					product.ProductName,
+					product.AltName,
+					product.Dine_in_price,
+					product.Take_out_price,
+					FoodTypes = product.FoodTypes.Select(ft => new
+					{
+						ft.TypeId,
+						ft.TypeName,
+						ft.Description
+					}),
+					Category = new
+					{
+						product.Category.CategoryId,
+						product.Category.Name,
+						product.Category.Description
+					}
+				};
+
+				return StatusCode(200, new CustomResponse(200, "Product updated successfully", responseData));
+			}
+			catch (Exception ex)
+			{
+				
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
+		}
 
 		// DELETE: api/Products/5
 		[HttpDelete("{id}")]
-		public async Task<IActionResult> DeleteProduct(int id)
+		public async Task<ActionResult<CustomResponse>> DeleteProduct(int id)
 		{
 			var product = await _context.products.FindAsync(id);
 			if (product == null)
 			{
-				return NotFound("Invalid Id");
+				return StatusCode(404, new CustomResponse(404, "Product not found", null));
 			}
 
-			// Remove product from category.Products
-			var category = await _context.categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.CategoryId == product.CategoryId);
-			category.Products.Remove(product);
-
 			_context.products.Remove(product);
-			_context.SaveChanges();
+			await _context.SaveChangesAsync();
 
-			return NoContent();
+			return StatusCode(200, new CustomResponse(200, "Product deleted successfully", null));
 		}
+
 	}
 }
 
-		
+
+
+

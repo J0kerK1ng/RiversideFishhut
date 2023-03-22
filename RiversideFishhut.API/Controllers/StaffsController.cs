@@ -20,74 +20,62 @@ namespace RiversideFishhut.API.Controllers
 			_context = context;
 		}
 
-		// GET: api/staffs
-		[HttpGet]
-		public async Task<ActionResult<IEnumerable<object>>> GetStaffs()
+		public class LoginRequest
 		{
-			// return only the required fields using anonymous type
-			return await _context.staffs
-				.Select(s => new { s.StaffId, s.roleId, s.StaffName })
-				.ToListAsync();
+			public string StaffName { get; set; }
+			public string Password { get; set; }
 		}
 
-		// GET: api/staff-roles
-		[HttpGet("staff-roles")]
-		public async Task<ActionResult<IEnumerable<object>>> GetStaffRoles()
+		public class PasswordChangeRequest
 		{
-			// join the staffs and roles tables and select only the required fields using anonymous type
-			return await _context.staffs
-				.Join(_context.staffs, s => s.roleId, r => r.roleId, (s, r) => new { s.StaffId, s.StaffName, r.Description })
-				.ToListAsync();
+			public string NewPassword { get; set; }
 		}
 
-		// POST: api/staff-roles
-		[HttpPost("staff-roles")]
-		public async Task<ActionResult<object>> PostStaffRole(Staff staff)
+		private bool StaffExists(int id)
 		{
-			// add the new staff to the database and save changes
-			_context.staffs.Add(staff);
-			await _context.SaveChangesAsync();
-
-			// retrieve the new staff with the role description and return only the required fields using anonymous type
-			var result = await _context.staffs
-				.Join(_context.staffs, s => s.roleId, r => r.roleId, (s, r) => new { s.StaffId, s.roleId, s.StaffName, r.Description })
-				.SingleAsync(s => s.StaffId == staff.StaffId);
-
-			return result;
+			return _context.staffs.Any(e => e.StaffId == id);
 		}
 
-		// GET: api/staffs/5
-		[HttpGet("{id}")]
-		public async Task<ActionResult<object>> GetStaff(int id)
+		// POST: api/staffs/login
+		[HttpPost("login")]
+		public async Task<ActionResult<object>> LoginStaff([FromBody] LoginRequest loginRequest)
 		{
-			// retrieve the staff with the given id and return only the required fields using anonymous type
 			var staff = await _context.staffs
-				.Select(s => new { s.StaffId, s.roleId, s.StaffName })
-				.FirstOrDefaultAsync(s => s.StaffId == id);
+				.Where(s => s.StaffName == loginRequest.StaffName && s.Password == loginRequest.Password)
+				.Select(s => new
+				{
+					s.StaffId,
+					s.RoleId,
+					s.StaffName
+				})
+				.FirstOrDefaultAsync();
 
 			if (staff == null)
 			{
-				return NotFound();
+				return StatusCode(401, new { status = 401, message = "Invalid credentials" });
 			}
 
-			return staff;
+			return StatusCode(200, new
+			{
+				status = 200,
+				message = "Login successful",
+				staff = new[] { staff }
+			});
 		}
 
-		// PUT: api/staffs/5
-		[HttpPut("{id}")]
-		public async Task<IActionResult> PutStaff(int id, Staff staff)
+		// PUT: api/staffs/password/{id}
+		[HttpPut("password/{id}")]
+		public async Task<ActionResult<object>> ChangePassword(int id, [FromBody] PasswordChangeRequest passwordChangeRequest)
 		{
-			// retrieve the staff with the given id and update the StaffName and Password properties
-			var existingStaff = await _context.staffs.FindAsync(id);
-			if (existingStaff == null)
+			var staff = await _context.staffs.FindAsync(id);
+
+			if (staff == null)
 			{
-				return NotFound();
+				return NotFound(new { status = 404, message = "Staff not found" });
 			}
 
-			existingStaff.StaffName = staff.StaffName;
-			existingStaff.Password = staff.Password;
-
-			_context.Entry(existingStaff).State = EntityState.Modified;
+			staff.Password = passwordChangeRequest.NewPassword;
+			_context.Entry(staff).State = EntityState.Modified;
 
 			try
 			{
@@ -97,7 +85,7 @@ namespace RiversideFishhut.API.Controllers
 			{
 				if (!StaffExists(id))
 				{
-					return NotFound();
+					return NotFound(new { status = 404, message = "Staff not found" });
 				}
 				else
 				{
@@ -105,30 +93,17 @@ namespace RiversideFishhut.API.Controllers
 				}
 			}
 
-			return Ok(new { status = "Success", message = $"Staff with id {id} updated successfully" });
-		}
-
-		// DELETE: api/staffs/5
-		[HttpDelete("{id}")]
-		public async Task<IActionResult> DeleteStaff(int id)
-		{
-			// retrieve the staff with the given id and remove it from the database
-			var staff = await _context.staffs.FindAsync(id);
-			if (staff == null)
+			return StatusCode(200, new
 			{
-				return NotFound();
-			}
-
-			_context.staffs.Remove(staff);
-			await _context.SaveChangesAsync();
-
-			return NoContent();
+				status = 200,
+				message = "Password changed successfully",
+				data = (object)null
+			});
 		}
 
-		private bool StaffExists(int id)
-		{
-			return _context.staffs.Any(e => e.StaffId == id);
-		}
+		
+
+		
 	}
 }
 
