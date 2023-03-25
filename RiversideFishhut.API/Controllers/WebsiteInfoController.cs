@@ -33,7 +33,17 @@ namespace RiversideFishhut.API.Controllers
 					return StatusCode(404, new CustomResponse(404, "Website info not found", null));
 				}
 
-				return StatusCode(200, new CustomResponse(200, "Website info retrieved successfully", websiteInfo));
+				var responseData = new
+				{
+					websiteInfo.StoreName,
+					websiteInfo.LogoImage,
+					websiteInfo.Description,
+					websiteInfo.Address,
+					websiteInfo.PhoneNumber,
+					websiteInfo.OnlineOrderLink
+				};
+
+				return StatusCode(200, new CustomResponse(200, "Website info retrieved successfully", responseData));
 			}
 			catch (Exception ex)
 			{
@@ -42,39 +52,40 @@ namespace RiversideFishhut.API.Controllers
 			}
 		}
 
-		// PUT: api/WebsiteInfo/5
-		[HttpPut("{id}")]
-		public async Task<ActionResult<CustomResponse>> PutWebsiteInfo(int id, WebsiteInfo websiteInfo)
+		// POST: api/WebsiteInfo
+		[HttpPost]
+		public async Task<ActionResult<CustomResponse>> PostWebsiteInfo(WebsiteInfo websiteInfo)
 		{
-			if (id != websiteInfo.InfoId)
-			{
-				return BadRequest(new CustomResponse(400, "Invalid record Id", null));
-			}
-
-			_context.Entry(websiteInfo).State = EntityState.Modified;
-
 			try
 			{
+				var existingWebsiteInfo = await _context.websiteInfos.FirstOrDefaultAsync();
+
+				if (existingWebsiteInfo != null)
+				{
+					return StatusCode(400, new CustomResponse(400, "Website info already exists. Please update the existing info instead of creating a new one.", null));
+				}
+
+				_context.websiteInfos.Add(websiteInfo);
 				await _context.SaveChangesAsync();
+
+				var responseData = new
+				{
+					websiteInfo.StoreName,
+					websiteInfo.LogoImage,
+					websiteInfo.Description,
+					websiteInfo.Address,
+					websiteInfo.PhoneNumber,
+					websiteInfo.OnlineOrderLink
+				};
+
+				return StatusCode(201, new CustomResponse(201, "Website info created successfully", responseData));
 			}
-			catch (DbUpdateConcurrencyException)
+			catch (Exception ex)
 			{
-				if (!WebsiteInfoExists(id))
-				{
-					return StatusCode(404, new CustomResponse(404, "Website info not found", null));
-				}
-				else
-				{
-					throw;
-				}
+				// You can log the exception here if needed
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
 			}
-
-			return StatusCode(200, new CustomResponse(200, "Website info updated successfully", null));
-		}
-
-		private bool WebsiteInfoExists(int id)
-		{
-			return _context.websiteInfos.Any(e => e.InfoId == id);
 		}
 	}
 }
+

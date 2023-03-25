@@ -29,9 +29,9 @@ namespace RiversideFishhut.API.Controllers
 				var businessHours = await _context.businessHours
 					.Select(b => new
 					{
-						b.BusinessHourId,
-						b.DayOfWeek,
-						b.BusinessTime
+						BusinessHourId = b.BusinessHourId.ToString(),
+						DayOfWeek = b.DayOfWeek,
+						BusinessTime = $"{b.BusinessTime:hh\\:mm} - {b.BusinessTime.AddHours(8):hh\\:mm}"
 					})
 					.ToListAsync();
 
@@ -46,16 +46,17 @@ namespace RiversideFishhut.API.Controllers
 
 		// PUT: api/business-hours/5
 		[HttpPut("{id}")]
-		public async Task<ActionResult<CustomResponse>> PutBusinessHour(int id, BusinessHour businessHour)
+		public async Task<ActionResult<CustomResponse>> PutBusinessHour(int id, [FromBody] BusinessHourDto businessHourDto)
 		{
-			if (id != businessHour.BusinessHourId)
+			var businessHour = await _context.businessHours.FindAsync(id);
+
+			if (businessHour == null)
 			{
-				return BadRequest(new CustomResponse(400, "Invalid record Id", null));
+				return NotFound(new CustomResponse(404, "Business hour not found", null));
 			}
 
-			// only update the required fields
-			_context.Entry(businessHour).Property(b => b.DayOfWeek).IsModified = true;
-			_context.Entry(businessHour).Property(b => b.BusinessTime).IsModified = true;
+			businessHour.DayOfWeek = businessHourDto.DayOfWeek;
+			businessHour.BusinessTime = businessHourDto.BusinessTime;
 
 			try
 			{
