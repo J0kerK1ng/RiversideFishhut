@@ -31,7 +31,7 @@ namespace RiversideFishhut.API.Controllers
 					{
 						BusinessHourId = b.BusinessHourId.ToString(),
 						DayOfWeek = b.DayOfWeek,
-						BusinessTime = $"{b.BusinessTime:hh\\:mm} - {b.BusinessTime.AddHours(8):hh\\:mm}"
+						BusinessTime = b.BusinessTime,
 					})
 					.ToListAsync();
 
@@ -44,43 +44,40 @@ namespace RiversideFishhut.API.Controllers
 			}
 		}
 
-		// PUT: api/business-hours/5
+		// PUT: api/business-hours/{id}
 		[HttpPut("{id}")]
-		public async Task<ActionResult<CustomResponse>> PutBusinessHour(int id, [FromBody] BusinessHourDto businessHourDto)
+		public async Task<ActionResult<CustomResponse>> UpdateBusinessHour(int id, UpdateBusinessHourRequest updateBusinessHourRequest)
 		{
-			var businessHour = await _context.businessHours.FindAsync(id);
-
-			if (businessHour == null)
-			{
-				return NotFound(new CustomResponse(404, "Business hour not found", null));
-			}
-
-			businessHour.DayOfWeek = businessHourDto.DayOfWeek;
-			businessHour.BusinessTime = businessHourDto.BusinessTime;
-
 			try
 			{
-				await _context.SaveChangesAsync();
-			}
-			catch (DbUpdateConcurrencyException)
-			{
-				if (!BusinessHourExists(id))
+				var businessHour = await _context.businessHours.FindAsync(id);
+
+				if (businessHour == null)
 				{
 					return NotFound(new CustomResponse(404, "Business hour not found", null));
 				}
-				else
+
+				businessHour.DayOfWeek = updateBusinessHourRequest.DayOfWeek;
+				businessHour.BusinessTime = updateBusinessHourRequest.BusinessTime;
+
+				await _context.SaveChangesAsync();
+
+				var responseData = new
 				{
-					throw;
-				}
+					businessHour.BusinessHourId,
+					businessHour.DayOfWeek,
+					businessHour.BusinessTime
+				};
+
+				return StatusCode(200, new CustomResponse(200, "Business hour updated successfully", responseData));
 			}
-
-			return new CustomResponse(200, "Business hour updated successfully", null);
+			catch (Exception ex)
+			{
+				// You can log the exception here if needed
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
 		}
 
-		private bool BusinessHourExists(int id)
-		{
-			return _context.businessHours.Any(e => e.BusinessHourId == id);
-		}
 	}
 }
 

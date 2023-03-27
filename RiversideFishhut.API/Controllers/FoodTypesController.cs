@@ -8,7 +8,7 @@ using RiversideFishhut.API.Data;
 
 namespace RiversideFishhut.API.Controllers
 {
-	[Route("api/[controller]")]
+	[Route("api/product-foodType")]
 	[ApiController]
 	public class FoodTypesController : ControllerBase
 	{
@@ -40,12 +40,17 @@ namespace RiversideFishhut.API.Controllers
 			}
 		}
 
-		// POST: api/FoodTypes
 		[HttpPost]
-		public async Task<ActionResult<CustomResponse>> PostFoodType(FoodType foodType)
+		public async Task<ActionResult<CustomResponse>> PostFoodType(CreateFoodTypeRequest createFoodTypeRequest)
 		{
 			try
 			{
+				FoodType foodType = new FoodType
+				{
+					TypeName = createFoodTypeRequest.TypeName,
+					Description = createFoodTypeRequest.Description
+				};
+
 				_context.foodTypes.Add(foodType);
 				await _context.SaveChangesAsync();
 
@@ -60,35 +65,48 @@ namespace RiversideFishhut.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+				//return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+				return StatusCode(500, new CustomResponse(500, $"Internal Server Error: {ex.Message}. Inner exception: {ex.InnerException?.Message}", null));
+
 			}
 		}
 
+
+
+
 		// PUT: api/FoodTypes/5
 		[HttpPut("{id}")]
-		public async Task<ActionResult<CustomResponse>> UpdateFoodType(int id, FoodType updateFoodTypeRequest)
+		public async Task<ActionResult<CustomResponse>> UpdateFoodType(int id, UpdateFoodTypeRequest updateFoodTypeRequest)
 		{
-			var foodType = await _context.foodTypes.FindAsync(id);
-
-			if (foodType == null)
-			{
-				return NotFound(new CustomResponse(404, "Food type not found", null));
-			}
-
 			try
 			{
+				var foodType = await _context.foodTypes.FindAsync(id);
+
+				if (foodType == null)
+				{
+					return NotFound(new CustomResponse(404, "Food type not found", null));
+				}
+
 				foodType.TypeName = updateFoodTypeRequest.TypeName;
 				foodType.Description = updateFoodTypeRequest.Description;
 
 				await _context.SaveChangesAsync();
 
-				return new CustomResponse(200, "Food type updated successfully", null);
+				var responseData = new
+				{
+					foodType.TypeId,
+					foodType.TypeName,
+					foodType.Description
+				};
+
+				return new CustomResponse(200, "Food type updated successfully", responseData);
 			}
 			catch (Exception ex)
 			{
 				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
 			}
 		}
+
 
 		// DELETE: api/FoodTypes/5
 		[HttpDelete("{id}")]

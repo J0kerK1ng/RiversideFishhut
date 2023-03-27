@@ -10,9 +10,9 @@ namespace RiversideFishhut.API.Data
 		public string TypeName { get; set; }
 		public string Description { get; set; }
 
-		[ForeignKey(nameof(ProductId))]
-		public int ProductId { get; set; }
-		public virtual Product Product { get; set; }
+		// Removed ProductId and Product properties
+
+		public ICollection<ProductFoodType> ProductFoodTypes { get; set; }
 	}
 }
 

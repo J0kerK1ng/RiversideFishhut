@@ -28,8 +28,8 @@ namespace RiversideFishhut.API.Migrations
                 {
                     CategoryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -143,7 +143,7 @@ namespace RiversideFishhut.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TypeName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false)
+                    ProductId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -152,19 +152,59 @@ namespace RiversideFishhut.API.Migrations
                         name: "FK_foodTypes_products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "products",
-                        principalColumn: "ProductId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ProductId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "productFoodTypes",
+                columns: table => new
+                {
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    TypeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_productFoodTypes", x => new { x.ProductId, x.TypeId });
+                    table.ForeignKey(
+                        name: "FK_productFoodTypes_foodTypes_TypeId",
+                        column: x => x.TypeId,
+                        principalTable: "foodTypes",
+                        principalColumn: "TypeId");
+                    table.ForeignKey(
+                        name: "FK_productFoodTypes_products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "products",
+                        principalColumn: "ProductId");
                 });
 
             migrationBuilder.InsertData(
                 table: "businessHours",
                 columns: new[] { "BusinessHourId", "BusinessTime", "DayOfWeek" },
-                values: new object[] { 1, "09:00 - 17:00", "Monday" });
+                values: new object[,]
+                {
+                    { 1, "Closed", "Monday" },
+                    { 2, "09:00 - 17:00", "Tuesday" },
+                    { 3, "09:00 - 17:00", "Wednesday" },
+                    { 4, "09:00 - 17:00", "Thursday" },
+                    { 5, "09:00 - 17:00", "Friday" },
+                    { 6, "09:00 - 17:00", "Saturday" },
+                    { 7, "Closed", "Sunday" }
+                });
 
             migrationBuilder.InsertData(
                 table: "categories",
                 columns: new[] { "CategoryId", "Description", "Name" },
                 values: new object[] { 1, "Main Dish", "2 PC Dinner" });
+
+            migrationBuilder.InsertData(
+                table: "foodTypes",
+                columns: new[] { "TypeId", "Description", "ProductId", "TypeName" },
+                values: new object[,]
+                {
+                    { 1, "This type is for 2 Pc fish with 1 pack chip.", null, "2 PC Dinner" },
+                    { 2, "This is fish.", null, "Fish " },
+                    { 3, "This product has discount right now.", null, "Deal" }
+                });
 
             migrationBuilder.InsertData(
                 table: "roles",
@@ -206,9 +246,23 @@ namespace RiversideFishhut.API.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "foodTypes",
-                columns: new[] { "TypeId", "Description", "ProductId", "TypeName" },
-                values: new object[] { 1, "This type is for 2 Pc fish with 1 pack chip.", 1, "2 PC Dinner" });
+                table: "productFoodTypes",
+                columns: new[] { "ProductId", "TypeId" },
+                values: new object[,]
+                {
+                    { 1, 1 },
+                    { 1, 2 },
+                    { 1, 3 },
+                    { 2, 1 },
+                    { 2, 2 },
+                    { 2, 3 },
+                    { 3, 1 },
+                    { 3, 2 },
+                    { 3, 3 },
+                    { 4, 1 },
+                    { 4, 2 },
+                    { 4, 3 }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_admins_RoleId",
@@ -219,6 +273,11 @@ namespace RiversideFishhut.API.Migrations
                 name: "IX_foodTypes_ProductId",
                 table: "foodTypes",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_productFoodTypes_TypeId",
+                table: "productFoodTypes",
+                column: "TypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_products_CategoryId",
@@ -240,7 +299,7 @@ namespace RiversideFishhut.API.Migrations
                 name: "businessHours");
 
             migrationBuilder.DropTable(
-                name: "foodTypes");
+                name: "productFoodTypes");
 
             migrationBuilder.DropTable(
                 name: "staffs");
@@ -249,10 +308,13 @@ namespace RiversideFishhut.API.Migrations
                 name: "websiteInfos");
 
             migrationBuilder.DropTable(
-                name: "products");
+                name: "foodTypes");
 
             migrationBuilder.DropTable(
                 name: "roles");
+
+            migrationBuilder.DropTable(
+                name: "products");
 
             migrationBuilder.DropTable(
                 name: "categories");

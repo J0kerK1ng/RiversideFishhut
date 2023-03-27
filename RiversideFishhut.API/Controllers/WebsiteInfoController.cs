@@ -35,6 +35,7 @@ namespace RiversideFishhut.API.Controllers
 
 				var responseData = new
 				{
+					websiteInfo.InfoId,
 					websiteInfo.StoreName,
 					websiteInfo.LogoImage,
 					websiteInfo.Description,
@@ -51,21 +52,28 @@ namespace RiversideFishhut.API.Controllers
 				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
 			}
 		}
-
-		// POST: api/WebsiteInfo
-		[HttpPost]
-		public async Task<ActionResult<CustomResponse>> PostWebsiteInfo(WebsiteInfo websiteInfo)
+		// POST: api/website-update
+		[HttpPost("website-update")]
+		public async Task<ActionResult<CustomResponse>> PostWebsiteInfo(UpdateWebsiteInfoRequest updateWebsiteInfoRequest)
 		{
 			try
 			{
-				var existingWebsiteInfo = await _context.websiteInfos.FirstOrDefaultAsync();
+				var websiteInfo = await _context.websiteInfos.FirstOrDefaultAsync();
 
-				if (existingWebsiteInfo != null)
+				if (websiteInfo == null)
 				{
-					return StatusCode(400, new CustomResponse(400, "Website info already exists. Please update the existing info instead of creating a new one.", null));
+					// Create a new website info if not exists
+					websiteInfo = new WebsiteInfo();
+					_context.websiteInfos.Add(websiteInfo);
 				}
 
-				_context.websiteInfos.Add(websiteInfo);
+				websiteInfo.StoreName = updateWebsiteInfoRequest.StoreName;
+				websiteInfo.LogoImage = updateWebsiteInfoRequest.LogoImage;
+				websiteInfo.Description = updateWebsiteInfoRequest.Description;
+				websiteInfo.Address = updateWebsiteInfoRequest.Address;
+				websiteInfo.PhoneNumber = updateWebsiteInfoRequest.PhoneNumber;
+				websiteInfo.OnlineOrderLink = updateWebsiteInfoRequest.OnlineOrderLink;
+
 				await _context.SaveChangesAsync();
 
 				var responseData = new
@@ -78,7 +86,7 @@ namespace RiversideFishhut.API.Controllers
 					websiteInfo.OnlineOrderLink
 				};
 
-				return StatusCode(201, new CustomResponse(201, "Website info created successfully", responseData));
+				return StatusCode(200, new CustomResponse(200, "Website info updated successfully", responseData));
 			}
 			catch (Exception ex)
 			{
@@ -88,4 +96,8 @@ namespace RiversideFishhut.API.Controllers
 		}
 	}
 }
+
+
+
+
 

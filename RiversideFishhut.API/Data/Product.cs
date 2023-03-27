@@ -28,6 +28,8 @@ namespace RiversideFishhut.API.Data
 		{
 			FoodTypes = new List<FoodType>();
 		}
+
+		public ICollection<ProductFoodType> ProductFoodTypes { get; set; }
 	}
 }
 

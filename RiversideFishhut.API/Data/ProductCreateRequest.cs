@@ -1,13 +1,17 @@
-﻿namespace RiversideFishhut.API.Data
-{
-	public class ProductCreateRequest
-	{
-		public string ProductName { get; set; }
-		public string AltName { get; set; }
-		public decimal Dine_in_price { get; set; }
-		public decimal Take_out_price { get; set; }
+﻿using RiversideFishhut.API.Data;
 
-		public IList<FoodTypeCreateRequest> FoodTypes { get; set; }
-		public CategoryCreateRequest Category { get; set; }
-	}
+public class ProductCreateRequest
+{
+	public string ProductName { get; set; }
+	public string AltName { get; set; }
+	public decimal Dine_in_price { get; set; }
+	public decimal Take_out_price { get; set; }
+	public List<FoodTypeRequest> FoodTypes { get; set; } // Use a simplified FoodTypeRequest class
+	public int? CategoryId { get; set; } // Nullable CategoryId property
 }
+
+
+
+
+
+
