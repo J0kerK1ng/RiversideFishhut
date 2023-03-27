@@ -12,7 +12,7 @@ using RiversideFishhut.API.Data;
 namespace RiversideFishhut.API.Migrations
 {
     [DbContext(typeof(RiversideFishhutDbContext))]
-    [Migration("20230327052146_MigrationWithData")]
+    [Migration("20230327162340_MigrationWithData")]
     partial class MigrationWithData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -216,8 +216,12 @@ namespace RiversideFishhut.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Dine_in_price")
                         .HasColumnType("decimal(18,2)");
@@ -241,6 +245,7 @@ namespace RiversideFishhut.API.Migrations
                             ProductId = 1,
                             AltName = "2 PC W/C",
                             CategoryId = 1,
+                            Description = "Description",
                             Dine_in_price = 10m,
                             ProductName = "2Pc Whitefish & Chips",
                             Take_out_price = 9m
@@ -250,6 +255,7 @@ namespace RiversideFishhut.API.Migrations
                             ProductId = 2,
                             AltName = "2 PC COD/C",
                             CategoryId = 1,
+                            Description = "Description",
                             Dine_in_price = 12m,
                             ProductName = "2Pc Cod & Chips",
                             Take_out_price = 11m
@@ -259,6 +265,7 @@ namespace RiversideFishhut.API.Migrations
                             ProductId = 3,
                             AltName = "2 PC HDK/C",
                             CategoryId = 1,
+                            Description = "Description",
                             Dine_in_price = 14m,
                             ProductName = "2Pc Haddock & Chips",
                             Take_out_price = 13m
@@ -268,6 +275,7 @@ namespace RiversideFishhut.API.Migrations
                             ProductId = 4,
                             AltName = "2PC HB/C",
                             CategoryId = 1,
+                            Description = "Description",
                             Dine_in_price = 16m,
                             ProductName = "2Pc Halibut & Chips",
                             Take_out_price = 15m
@@ -505,9 +513,7 @@ namespace RiversideFishhut.API.Migrations
                 {
                     b.HasOne("RiversideFishhut.API.Data.Category", "Category")
                         .WithMany("Products")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CategoryId");
 
                     b.Navigation("Category");
                 });

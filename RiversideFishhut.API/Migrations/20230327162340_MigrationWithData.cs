@@ -76,9 +76,10 @@ namespace RiversideFishhut.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AltName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Dine_in_price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Take_out_price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                    CategoryId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -87,8 +88,7 @@ namespace RiversideFishhut.API.Migrations
                         name: "FK_products_categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "categories",
-                        principalColumn: "CategoryId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "CategoryId");
                 });
 
             migrationBuilder.CreateTable(
@@ -227,13 +227,13 @@ namespace RiversideFishhut.API.Migrations
 
             migrationBuilder.InsertData(
                 table: "products",
-                columns: new[] { "ProductId", "AltName", "CategoryId", "Dine_in_price", "ProductName", "Take_out_price" },
+                columns: new[] { "ProductId", "AltName", "CategoryId", "Description", "Dine_in_price", "ProductName", "Take_out_price" },
                 values: new object[,]
                 {
-                    { 1, "2 PC W/C", 1, 10m, "2Pc Whitefish & Chips", 9m },
-                    { 2, "2 PC COD/C", 1, 12m, "2Pc Cod & Chips", 11m },
-                    { 3, "2 PC HDK/C", 1, 14m, "2Pc Haddock & Chips", 13m },
-                    { 4, "2PC HB/C", 1, 16m, "2Pc Halibut & Chips", 15m }
+                    { 1, "2 PC W/C", 1, "Description", 10m, "2Pc Whitefish & Chips", 9m },
+                    { 2, "2 PC COD/C", 1, "Description", 12m, "2Pc Cod & Chips", 11m },
+                    { 3, "2 PC HDK/C", 1, "Description", 14m, "2Pc Haddock & Chips", 13m },
+                    { 4, "2PC HB/C", 1, "Description", 16m, "2Pc Halibut & Chips", 15m }
                 });
 
             migrationBuilder.InsertData(

@@ -5,7 +5,6 @@ namespace RiversideFishhut.API.Data
 {
 	public class RiversideFishhutDbContext : DbContext
 	{
-		internal readonly object Categories;
 
 		public RiversideFishhutDbContext(DbContextOptions options) : base(options)
 		{
@@ -203,6 +202,7 @@ namespace RiversideFishhut.API.Data
 					ProductId = 1,
 					ProductName = "2Pc Whitefish & Chips",
 					AltName = "2 PC W/C",
+					Description = "Description",
 					Dine_in_price = 10,
 					Take_out_price = 9,
 					CategoryId = 1,
@@ -212,6 +212,7 @@ namespace RiversideFishhut.API.Data
 					ProductId = 2,
 					ProductName = "2Pc Cod & Chips",
 					AltName = "2 PC COD/C",
+					Description = "Description",
 					Dine_in_price = 12,
 					Take_out_price = 11,
 					CategoryId = 1,
@@ -221,6 +222,7 @@ namespace RiversideFishhut.API.Data
 					ProductId = 3,
 					ProductName = "2Pc Haddock & Chips",
 					AltName = "2 PC HDK/C",
+					Description = "Description",
 					Dine_in_price = 14,
 					Take_out_price = 13,
 					CategoryId = 1,
@@ -230,6 +232,7 @@ namespace RiversideFishhut.API.Data
 					ProductId = 4,
 					ProductName = "2Pc Halibut & Chips",
 					AltName = "2PC HB/C",
+					Description = "Description",
 					Dine_in_price = 16,
 					Take_out_price = 15,
 					CategoryId = 1,

@@ -14,11 +14,13 @@ namespace RiversideFishhut.API.Data
 
 		public string AltName { get; set; }
 
+		public string Description { get; set; }
+
 		public decimal Dine_in_price { get; set; }
 		public decimal Take_out_price { get; set; }
 
 		[ForeignKey(nameof(CategoryId))]
-		public int CategoryId { get; set; }
+		public int? CategoryId { get; set; }
 
 		public Category Category { get; set; }
 

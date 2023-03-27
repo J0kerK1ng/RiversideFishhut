@@ -38,6 +38,7 @@ namespace RiversideFishhut.API.Controllers
 						p.ProductId,
 						p.ProductName,
 						p.AltName,
+						p.Description,
 						p.Dine_in_price,
 						p.Take_out_price,
 						FoodTypes = p.ProductFoodTypes.Select(pft => pft.FoodType.TypeName).ToList(),
@@ -63,6 +64,7 @@ namespace RiversideFishhut.API.Controllers
 				{
 					ProductName = productCreateRequest.ProductName,
 					AltName = productCreateRequest.AltName,
+					Description = productCreateRequest.Description,
 					Dine_in_price = productCreateRequest.Dine_in_price,
 					Take_out_price = productCreateRequest.Take_out_price,
 					FoodTypes = new List<FoodType>()
@@ -101,6 +103,7 @@ namespace RiversideFishhut.API.Controllers
 					product.ProductId,
 					product.ProductName,
 					product.AltName,
+					product.Description,
 					product.Dine_in_price,
 					product.Take_out_price,
 					FoodTypes = product.FoodTypes.Select(ft => new
@@ -139,20 +142,25 @@ namespace RiversideFishhut.API.Controllers
 
 				product.ProductName = updateProductRequest.ProductName;
 				product.AltName = updateProductRequest.AltName;
+				product.Description = updateProductRequest.Description;
 				product.Dine_in_price = updateProductRequest.Dine_in_price;
 				product.Take_out_price = updateProductRequest.Take_out_price;
-				product.CategoryId = updateProductRequest.CategoryId;
+
+				if (updateProductRequest.CategoryId.HasValue)
+				{
+					product.CategoryId = updateProductRequest.CategoryId.Value;
+				}
 
 				// Update food types
 				product.FoodTypes.Clear();
-				if (updateProductRequest.FoodTypeIds != null && updateProductRequest.FoodTypeIds.Any())
+				if (updateProductRequest.FoodTypes != null && updateProductRequest.FoodTypes.Any())
 				{
-					foreach (var typeId in updateProductRequest.FoodTypeIds)
+					foreach (var typeId in updateProductRequest.FoodTypes)
 					{
 						var existingFoodType = await _context.foodTypes.FindAsync(typeId);
 						if (existingFoodType == null)
 						{
-							return NotFound("Food type not found");
+							return NotFound(new CustomResponse(404, $"Food type with ID {typeId} not found", null));
 						}
 
 						product.FoodTypes.Add(existingFoodType);
@@ -166,6 +174,7 @@ namespace RiversideFishhut.API.Controllers
 					product.ProductId,
 					product.ProductName,
 					product.AltName,
+					product.Description,
 					product.Dine_in_price,
 					product.Take_out_price,
 					FoodTypes = product.FoodTypes.Select(ft => new
@@ -189,7 +198,6 @@ namespace RiversideFishhut.API.Controllers
 				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
 			}
 		}
-
 
 		// DELETE: api/Products/5
 		[HttpDelete("{id}")]
