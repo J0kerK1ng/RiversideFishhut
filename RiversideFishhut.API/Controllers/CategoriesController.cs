@@ -25,48 +25,85 @@ namespace RiversideFishhut.API.Controllers
 		{
 			try
 			{
-				var categories = await _context.categories.Include(c => c.Products).ToListAsync();
-				return new CustomResponse(200, "Successfully", categories);
+				var categories = await _context.categories.ToListAsync();
+
+				var result = categories.Select(c => new
+				{
+					c.CategoryId,
+					c.Name,
+					c.Description
+				}).ToList();
+
+				return new CustomResponse(200, "Successfully retrieved categories", result);
 			}
 			catch (Exception ex)
 			{
-				
 				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
 			}
 		}
 
-		// GET: api/Categories/5
+		// GET: api/product-categories/5
 		[HttpGet("{id}")]
 		public async Task<ActionResult<CustomResponse>> GetCategory(int id)
 		{
-			try
-			{
-				var category = await _context.categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.CategoryId == id);
+			var category = await _context.categories.FindAsync(id);
 
-				if (category == null)
-				{
-					return NotFound(new CustomResponse(404, "Not Found", null));
-				}
-
-				return new CustomResponse(200, "Successfully", category);
-			}
-			catch (Exception ex)
+			if (category == null)
 			{
-				
-				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+				return NotFound(new CustomResponse(404, "Category not found", null));
 			}
+
+			var result = new
+			{
+				category.CategoryId,
+				category.Name,
+				category.Description
+			};
+
+			return new CustomResponse(200, "Successfully retrieved category", result);
 		}
 
-		// PUT: api/Categories/5
-		[HttpPut("{id}")]
-		public async Task<ActionResult<CustomResponse>> PutCategory(int id, Category category)
+		
+		// POST: api/product-categories
+		[HttpPost]
+		public async Task<ActionResult<CustomResponse>> PostCategory(CreateProductCategoryRequest createRequest)
 		{
-			if (id != category.CategoryId)
+			var category = new Category
 			{
-				return BadRequest(new CustomResponse(400, "Bad Request", null));
+				Name = createRequest.Name,
+				Description = createRequest.Description
+			};
+
+			_context.categories.Add(category);
+			await _context.SaveChangesAsync();
+
+			var data = new
+			{
+				category.CategoryId,
+				category.Name,
+				category.Description
+			};
+
+			return new CustomResponse(201, "Product category created successfully", data);
+		}
+
+		[HttpPut("{id}")]
+		public async Task<IActionResult> PutCategory(int id, CategoryUpdateRequest categoryUpdateRequest)
+		{
+			if (!CategoryExists(id))
+			{
+				return NotFound();
 			}
 
-			_context.Entry(category).State = EntityState.Modified;
+			var categoryToUpdate = await _context.categories.FindAsync(id);
+
+			if (categoryToUpdate == null)
+			{
+				return NotFound();
+			}
+
+			categoryToUpdate.Name = categoryUpdateRequest.Name;
+			categoryToUpdate.Description = categoryUpdateRequest.Description;
 
 			try
 			{
@@ -76,39 +113,27 @@ namespace RiversideFishhut.API.Controllers
 			{
 				if (!CategoryExists(id))
 				{
-					return NotFound(new CustomResponse(404, "Not Found", null));
+					return NotFound();
 				}
 				else
 				{
 					throw;
 				}
 			}
-			catch (Exception ex)
-			{
-				
-				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
-			}
 
-			return new CustomResponse(200, "Successfully", null);
+			var responseData = new
+			{
+				categoryToUpdate.CategoryId,
+				categoryToUpdate.Name,
+				categoryToUpdate.Description
+			};
+
+			return StatusCode(200, new CustomResponse(200, "Update successfully", responseData));
 		}
 
-		// POST: api/Categories
-		[HttpPost]
-		public async Task<ActionResult<CustomResponse>> PostCategory(Category category)
-		{
-			try
-			{
-				_context.categories.Add(category);
-				await _context.SaveChangesAsync();
-			}
-			catch (Exception ex)
-			{
-				
-				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
-			}
 
-			return CreatedAtAction(nameof(GetCategory), new { id = category.CategoryId }, new CustomResponse(200, "Successfully", category));
-		}
+
+
 
 		// DELETE: api/Categories/5
 		[HttpDelete("{id}")]
@@ -127,19 +152,22 @@ namespace RiversideFishhut.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				
+
 				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
 			}
 
 			return new CustomResponse(200, "Successfully", null);
 		}
-
-		private bool CategoryExists(int id)
+		private bool CategoryExists(int id) 
 		{
-			return _context.categories.Any(e => e.CategoryId == id);
+			return _context.categories.Any(c => c.CategoryId == id);
 		}
 	}
 }
+
+
+
+
 
 
 

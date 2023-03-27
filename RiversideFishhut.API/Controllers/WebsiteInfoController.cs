@@ -33,7 +33,18 @@ namespace RiversideFishhut.API.Controllers
 					return StatusCode(404, new CustomResponse(404, "Website info not found", null));
 				}
 
-				return StatusCode(200, new CustomResponse(200, "Website info retrieved successfully", websiteInfo));
+				var responseData = new
+				{
+					websiteInfo.InfoId,
+					websiteInfo.StoreName,
+					websiteInfo.LogoImage,
+					websiteInfo.Description,
+					websiteInfo.Address,
+					websiteInfo.PhoneNumber,
+					websiteInfo.OnlineOrderLink
+				};
+
+				return StatusCode(200, new CustomResponse(200, "Website info retrieved successfully", responseData));
 			}
 			catch (Exception ex)
 			{
@@ -41,40 +52,52 @@ namespace RiversideFishhut.API.Controllers
 				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
 			}
 		}
-
-		// PUT: api/WebsiteInfo/5
-		[HttpPut("{id}")]
-		public async Task<ActionResult<CustomResponse>> PutWebsiteInfo(int id, WebsiteInfo websiteInfo)
+		// POST: api/website-update
+		[HttpPost("website-update")]
+		public async Task<ActionResult<CustomResponse>> PostWebsiteInfo(UpdateWebsiteInfoRequest updateWebsiteInfoRequest)
 		{
-			if (id != websiteInfo.InfoId)
-			{
-				return BadRequest(new CustomResponse(400, "Invalid record Id", null));
-			}
-
-			_context.Entry(websiteInfo).State = EntityState.Modified;
-
 			try
 			{
+				var websiteInfo = await _context.websiteInfos.FirstOrDefaultAsync();
+
+				if (websiteInfo == null)
+				{
+					// Create a new website info if not exists
+					websiteInfo = new WebsiteInfo();
+					_context.websiteInfos.Add(websiteInfo);
+				}
+
+				websiteInfo.StoreName = updateWebsiteInfoRequest.StoreName;
+				websiteInfo.LogoImage = updateWebsiteInfoRequest.LogoImage;
+				websiteInfo.Description = updateWebsiteInfoRequest.Description;
+				websiteInfo.Address = updateWebsiteInfoRequest.Address;
+				websiteInfo.PhoneNumber = updateWebsiteInfoRequest.PhoneNumber;
+				websiteInfo.OnlineOrderLink = updateWebsiteInfoRequest.OnlineOrderLink;
+
 				await _context.SaveChangesAsync();
+
+				var responseData = new
+				{
+					websiteInfo.StoreName,
+					websiteInfo.LogoImage,
+					websiteInfo.Description,
+					websiteInfo.Address,
+					websiteInfo.PhoneNumber,
+					websiteInfo.OnlineOrderLink
+				};
+
+				return StatusCode(200, new CustomResponse(200, "Website info updated successfully", responseData));
 			}
-			catch (DbUpdateConcurrencyException)
+			catch (Exception ex)
 			{
-				if (!WebsiteInfoExists(id))
-				{
-					return StatusCode(404, new CustomResponse(404, "Website info not found", null));
-				}
-				else
-				{
-					throw;
-				}
+				// You can log the exception here if needed
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
 			}
-
-			return StatusCode(200, new CustomResponse(200, "Website info updated successfully", null));
-		}
-
-		private bool WebsiteInfoExists(int id)
-		{
-			return _context.websiteInfos.Any(e => e.InfoId == id);
 		}
 	}
 }
+
+
+
+
+

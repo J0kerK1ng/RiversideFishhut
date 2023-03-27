@@ -19,13 +19,12 @@ namespace RiversideFishhut.API.Controllers
 		{
 			_context = context;
 		}
-
 		// POST: api/admins/login
 		[HttpPost("login")]
-		public async Task<ActionResult<object>> LoginAdmin([FromBody] dynamic data)
+		public async Task<ActionResult<object>> LoginAdmin([FromBody] AdminLoginRequest request)
 		{
-			string adminName = data.AdminName;
-			string adminPassword = data.AdminPassword;
+			string adminName = request.AdminName;
+			string adminPassword = request.AdminPassword;
 
 			var admin = await _context.admins
 				.Where(a => a.AdminName == adminName && a.AdminPassword == adminPassword)
@@ -53,12 +52,11 @@ namespace RiversideFishhut.API.Controllers
 				}
 			});
 		}
-
-		// POST: api/admins/forget-password
-		[HttpPost("forget-password")]
-		public async Task<ActionResult<object>> ForgetPassword([FromBody] dynamic data)
+		// POST: api/auth/forgot-password
+		[HttpPost("forgot-password")]
+		public async Task<ActionResult<object>> ForgotPassword([FromBody] AdminForgotPasswordRequest request)
 		{
-			string adminName = data.AdminName;
+			string adminName = request.AdminName;
 
 			var admin = await _context.admins
 				.Where(a => a.AdminName == adminName)
@@ -69,16 +67,16 @@ namespace RiversideFishhut.API.Controllers
 				return StatusCode(404, new { status = 404, message = "Admin not found" });
 			}
 
+			// Replace this line with the actual password reset email sending logic
+			// SendPasswordResetEmail(admin.AdminEmailAddress);
 
-
-				return StatusCode(200, new
+			return StatusCode(200, new
 			{
-				status = 200,
-				message = $"Password reset instructions sent to {admin.AdminEmailAddress}",
-				data = (object)null
+				Status = 200,
+				Message = $"Password reset sent to {admin.AdminEmailAddress}",
+				Data = (object)null
 			});
 		}
-
 	}
 }
 
