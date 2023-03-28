@@ -9,100 +9,104 @@ using RiversideFishhut.API.Data;
 
 namespace RiversideFishhut.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class StaffsController : ControllerBase
-    {
-        private readonly RiversideFishhutDbContext _context;
+	[Route("api/[controller]")]
+	[ApiController]
+	public class StaffsController : ControllerBase
+	{
+		private readonly RiversideFishhutDbContext _context;
 
-        public StaffsController(RiversideFishhutDbContext context)
-        {
-            _context = context;
-        }
+		public StaffsController(RiversideFishhutDbContext context)
+		{
+			_context = context;
+		}
 
-        // GET: api/Staffs
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Staff>>> Getstaffs()
-        {
-            var staff = await _context.staffs.ToListAsync();
-            return Ok(staff); 
-        }
+		public class LoginRequest
+		{
+			public string StaffName { get; set; }
+			public string Password { get; set; }
+		}
 
-        // GET: api/Staffs/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Staff>> GetStaff(int id)
-        {
-            var staff = await _context.staffs.FindAsync(id);
+		public class PasswordChangeRequest
+		{
+			public string NewPassword { get; set; }
+		}
 
-            if (staff == null)
-            {
-                return NotFound();
-            }
+		private bool StaffExists(int id)
+		{
+			return _context.staffs.Any(e => e.StaffId == id);
+		}
 
-            return staff;
-        }
+		// POST: api/staffs/login
+		[HttpPost("login")]
+		public async Task<ActionResult<object>> LoginStaff([FromBody] LoginRequest loginRequest)
+		{
+			var staff = await _context.staffs
+				.Where(s => s.StaffName == loginRequest.StaffName && s.Password == loginRequest.Password)
+				.Select(s => new
+				{
+					s.StaffId,
+					s.RoleId,
+					s.StaffName
+				})
+				.FirstOrDefaultAsync();
 
-        // PUT: api/Staffs/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutStaff(int id, Staff staff)
-        {
-            if (id != staff.StaffId)
-            {
-                return BadRequest();
-            }
+			if (staff == null)
+			{
+				return StatusCode(401, new { status = 401, message = "Invalid credentials" });
+			}
 
-            _context.Entry(staff).State = EntityState.Modified;
+			return StatusCode(200, new
+			{
+				status = 200,
+				message = "Login successful",
+				staff = new[] { staff }
+			});
+		}
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StaffExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+		// PUT: api/staffs/password/{id}
+		[HttpPut("password/{id}")]
+		public async Task<ActionResult<object>> ChangePassword(int id, [FromBody] PasswordChangeRequest passwordChangeRequest)
+		{
+			var staff = await _context.staffs.FindAsync(id);
 
-            return NoContent();
-        }
+			if (staff == null)
+			{
+				return NotFound(new { status = 404, message = "Staff not found" });
+			}
 
-        // POST: api/Staffs
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Staff>> PostStaff(Staff staff)
-        {
-            _context.staffs.Add(staff);
-            await _context.SaveChangesAsync();
+			staff.Password = passwordChangeRequest.NewPassword;
+			_context.Entry(staff).State = EntityState.Modified;
 
-            return CreatedAtAction("GetStaff", new { id = staff.StaffId }, staff);
-        }
+			try
+			{
+				await _context.SaveChangesAsync();
+			}
+			catch (DbUpdateConcurrencyException)
+			{
+				if (!StaffExists(id))
+				{
+					return NotFound(new { status = 404, message = "Staff not found" });
+				}
+				else
+				{
+					throw;
+				}
+			}
 
-        // DELETE: api/Staffs/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStaff(int id)
-        {
-            var staff = await _context.staffs.FindAsync(id);
-            if (staff == null)
-            {
-                return NotFound("Invalid Id");
-            }
+			return StatusCode(200, new
+			{
+				status = 200,
+				message = "Password changed successfully",
+				data = (object)null
+			});
+		}
 
-            _context.staffs.Remove(staff);
-            await _context.SaveChangesAsync();
+		
 
-            return NoContent();
-        }
-
-        private bool StaffExists(int id)
-        {
-            return _context.staffs.Any(e => e.StaffId == id);
-        }
-    }
+		
+	}
 }
+
+
+
+

@@ -2,107 +2,133 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RiversideFishhut.API.Data;
 
 namespace RiversideFishhut.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class FoodTypesController : ControllerBase
-    {
-        private readonly RiversideFishhutDbContext _context;
+	[Route("api/product-foodType")]
+	[ApiController]
+	public class FoodTypesController : ControllerBase
+	{
+		private readonly RiversideFishhutDbContext _context;
 
-        public FoodTypesController(RiversideFishhutDbContext context)
-        {
-            _context = context;
-        }
+		public FoodTypesController(RiversideFishhutDbContext context)
+		{
+			_context = context;
+		}
 
-        // GET: api/FoodTypes
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<FoodType>>> GetfoodTypes()
-        {
-            var foodtype = await _context.foodTypes.ToListAsync();
-            return Ok(foodtype);
-        }
+		// GET: api/FoodTypes
+		[HttpGet]
+		public async Task<ActionResult<CustomResponse>> GetFoodTypes()
+		{
+			try
+			{
+				var foodTypes = await _context.foodTypes.Select(ft => new
+				{
+					ft.TypeId,
+					ft.TypeName,
+					ft.Description
+				}).ToListAsync();
 
-        // GET: api/FoodTypes/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<FoodType>> GetFoodType(int id)
-        {
-            var foodType = await _context.foodTypes.FindAsync(id);
+				return new CustomResponse(200, "Food types retrieved successfully", foodTypes);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
+		}
 
-            if (foodType == null)
-            {
-                return NotFound();
-            }
+		[HttpPost]
+		public async Task<ActionResult<CustomResponse>> PostFoodType(CreateFoodTypeRequest createFoodTypeRequest)
+		{
+			try
+			{
+				FoodType foodType = new FoodType
+				{
+					TypeName = createFoodTypeRequest.TypeName,
+					Description = createFoodTypeRequest.Description
+				};
 
-            return foodType;
-        }
+				_context.foodTypes.Add(foodType);
+				await _context.SaveChangesAsync();
 
-        // PUT: api/FoodTypes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutFoodType(int id, FoodType foodType)
-        {
-            if (id != foodType.TypeId)
-            {
-                return BadRequest();
-            }
+				var responseData = new
+				{
+					foodType.TypeId,
+					foodType.TypeName,
+					foodType.Description
+				};
 
-            _context.Entry(foodType).State = EntityState.Modified;
+				return CreatedAtAction(nameof(GetFoodTypes), new { id = foodType.TypeId }, new CustomResponse(201, "Food type created successfully", responseData));
+			}
+			catch (Exception ex)
+			{
+				//return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+				return StatusCode(500, new CustomResponse(500, $"Internal Server Error: {ex.Message}. Inner exception: {ex.InnerException?.Message}", null));
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!FoodTypeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+			}
+		}
 
-            return NoContent();
-        }
 
-        // POST: api/FoodTypes
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<FoodType>> PostFoodType(FoodType foodType)
-        {
-            _context.foodTypes.Add(foodType);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetFoodType", new { id = foodType.TypeId }, foodType);
-        }
 
-        // DELETE: api/FoodTypes/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFoodType(int id)
-        {
-            var foodType = await _context.foodTypes.FindAsync(id);
-            if (foodType == null)
-            {
-                return NotFound("Invalid Id");
-            }
+		// PUT: api/FoodTypes/5
+		[HttpPut("{id}")]
+		public async Task<ActionResult<CustomResponse>> UpdateFoodType(int id, UpdateFoodTypeRequest updateFoodTypeRequest)
+		{
+			try
+			{
+				var foodType = await _context.foodTypes.FindAsync(id);
 
-            _context.foodTypes.Remove(foodType);
-            await _context.SaveChangesAsync();
+				if (foodType == null)
+				{
+					return NotFound(new CustomResponse(404, "Food type not found", null));
+				}
 
-            return NoContent();
-        }
+				foodType.TypeName = updateFoodTypeRequest.TypeName;
+				foodType.Description = updateFoodTypeRequest.Description;
 
-        private bool FoodTypeExists(int id)
-        {
-            return _context.foodTypes.Any(e => e.TypeId == id);
-        }
-    }
+				await _context.SaveChangesAsync();
+
+				var responseData = new
+				{
+					foodType.TypeId,
+					foodType.TypeName,
+					foodType.Description
+				};
+
+				return new CustomResponse(200, "Food type updated successfully", responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
+		}
+
+
+		// DELETE: api/FoodTypes/5
+		[HttpDelete("{id}")]
+		public async Task<ActionResult<CustomResponse>> DeleteFoodType(int id)
+		{
+			var foodType = await _context.foodTypes.FindAsync(id);
+			if (foodType == null)
+			{
+				return NotFound(new CustomResponse(404, "Food type not found", null));
+			}
+
+			try
+			{
+				_context.foodTypes.Remove(foodType);
+				await _context.SaveChangesAsync();
+
+				return new CustomResponse(200, "Food type deleted successfully", null);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
+		}
+	}
 }

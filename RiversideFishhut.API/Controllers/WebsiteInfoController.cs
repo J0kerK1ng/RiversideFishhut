@@ -9,101 +9,95 @@ using RiversideFishhut.API.Data;
 
 namespace RiversideFishhut.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class WebsiteInfoController : ControllerBase
-    {
-        private readonly RiversideFishhutDbContext _context;
+	[Route("api/website-info")]
+	[ApiController]
+	public class WebsiteInfoController : ControllerBase
+	{
+		private readonly RiversideFishhutDbContext _context;
 
-        public WebsiteInfoController(RiversideFishhutDbContext context)
-        {
-            _context = context;
-        }
+		public WebsiteInfoController(RiversideFishhutDbContext context)
+		{
+			_context = context;
+		}
 
-        // GET: api/WebsiteInfo
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<WebsiteInfo>>> GetwebsiteInfos()
-        {
-            //Select * from Countries
-            var websiteInfo = await _context.websiteInfos.ToListAsync();
-            return Ok(websiteInfo); 
-        }
+		// GET: api/WebsiteInfo
+		[HttpGet]
+		public async Task<ActionResult<CustomResponse>> GetWebsiteInfo()
+		{
+			try
+			{
+				var websiteInfo = await _context.websiteInfos.FirstOrDefaultAsync();
 
-        // GET: api/WebsiteInfo/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<WebsiteInfo>> GetWebsiteInfo(int id)
-        {
-            var websiteInfo = await _context.websiteInfos.FindAsync(id);
+				if (websiteInfo == null)
+				{
+					return StatusCode(404, new CustomResponse(404, "Website info not found", null));
+				}
 
-            if (websiteInfo == null)
-            {
-                return NotFound();
-            }
+				var responseData = new
+				{
+					websiteInfo.InfoId,
+					websiteInfo.StoreName,
+					websiteInfo.LogoImage,
+					websiteInfo.Description,
+					websiteInfo.Address,
+					websiteInfo.PhoneNumber,
+					websiteInfo.OnlineOrderLink
+				};
 
-            return Ok(websiteInfo);
-        }
+				return StatusCode(200, new CustomResponse(200, "Website info retrieved successfully", responseData));
+			}
+			catch (Exception ex)
+			{
+				// You can log the exception here if needed
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
+		}
+		// POST: api/website-update
+		[HttpPost("website-update")]
+		public async Task<ActionResult<CustomResponse>> PostWebsiteInfo(UpdateWebsiteInfoRequest updateWebsiteInfoRequest)
+		{
+			try
+			{
+				var websiteInfo = await _context.websiteInfos.FirstOrDefaultAsync();
 
-        // PUT: api/WebsiteInfo/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutWebsiteInfo(int id, WebsiteInfo websiteInfo)
-        {
-            if (id != websiteInfo.InfoId)
-            {
-                return BadRequest("Invalid record Id");
-            }
+				if (websiteInfo == null)
+				{
+					// Create a new website info if not exists
+					websiteInfo = new WebsiteInfo();
+					_context.websiteInfos.Add(websiteInfo);
+				}
 
-            _context.Entry(websiteInfo).State = EntityState.Modified;
+				websiteInfo.StoreName = updateWebsiteInfoRequest.StoreName;
+				websiteInfo.LogoImage = updateWebsiteInfoRequest.LogoImage;
+				websiteInfo.Description = updateWebsiteInfoRequest.Description;
+				websiteInfo.Address = updateWebsiteInfoRequest.Address;
+				websiteInfo.PhoneNumber = updateWebsiteInfoRequest.PhoneNumber;
+				websiteInfo.OnlineOrderLink = updateWebsiteInfoRequest.OnlineOrderLink;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WebsiteInfoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+				await _context.SaveChangesAsync();
 
-            return NoContent();
-        }
+				var responseData = new
+				{
+					websiteInfo.StoreName,
+					websiteInfo.LogoImage,
+					websiteInfo.Description,
+					websiteInfo.Address,
+					websiteInfo.PhoneNumber,
+					websiteInfo.OnlineOrderLink
+				};
 
-        // POST: api/WebsiteInfo
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<WebsiteInfo>> PostWebsiteInfo(WebsiteInfo websiteInfo)
-        {
-            _context.websiteInfos.Add(websiteInfo);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetWebsiteInfo", new { id = websiteInfo.InfoId }, websiteInfo);
-        }
-
-        // DELETE: api/WebsiteInfo/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteWebsiteInfo(int id)
-        {
-            var websiteInfo = await _context.websiteInfos.FindAsync(id);
-            if (websiteInfo == null)
-            {
-                return NotFound();
-            }
-
-            _context.websiteInfos.Remove(websiteInfo);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool WebsiteInfoExists(int id)
-        {
-            return _context.websiteInfos.Any(e => e.InfoId == id);
-        }
-    }
+				return StatusCode(200, new CustomResponse(200, "Website info updated successfully", responseData));
+			}
+			catch (Exception ex)
+			{
+				// You can log the exception here if needed
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
+		}
+	}
 }
+
+
+
+
+
