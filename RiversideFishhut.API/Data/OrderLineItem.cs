@@ -14,6 +14,8 @@ namespace RiversideFishhut.API.Data
         [ForeignKey(nameof(ProductId))]
         public int ProductId { get; set; }
 
+        public Product product { get; set; }
+
         public int Quantity { get; set; }
     }
 }

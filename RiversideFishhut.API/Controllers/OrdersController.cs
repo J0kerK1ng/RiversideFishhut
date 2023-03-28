@@ -35,6 +35,34 @@ namespace RiversideFishhut.API.Controllers
             return await _context.order.OrderByDescending(o => o.OrderId).Take(5).ToListAsync();
         }
 
+        //[HttpGet("{id}/OrderTotal")]
+        //private async Task<double> GetTotalPrice(int orderId)
+        //{
+        //    var order = await _context.order.Include(o => o.OrderLineItems).ThenInclude(oli => oli.Product).FirstOrDefaultAsync(o => o.OrderId == orderId);
+        //    var orderLineItems = await _context.orderLineItem 
+
+        //    if (order == null)
+        //    {
+        //        return 0;
+        //    }
+
+        //    double totalPrice = 0;
+
+        //    foreach (var lineItem in order.OrderLineItems)
+        //    {
+        //        if (order.OrderTypeId == 1)
+        //        {
+        //            totalPrice += lineItem.Product.PriceDineIn * lineItem.Quantity;
+        //        }
+        //        else
+        //        {
+        //            totalPrice += lineItem.Product.PriceTakeOut * lineItem.Quantity;
+        //        }
+        //    }
+
+        //    return totalPrice;
+        //}
+
         // GET: api/Orders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)
