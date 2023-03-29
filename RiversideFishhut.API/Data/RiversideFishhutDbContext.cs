@@ -10,7 +10,6 @@ namespace RiversideFishhut.API.Data
 		{
 		}
 
-		public DbSet<Admin> admins { get; set; }
 		public DbSet<Category> categories { get; set; }
 		public DbSet<FoodType> foodTypes { get; set; }
 		public DbSet<Product> products { get; set; }
@@ -24,10 +23,6 @@ namespace RiversideFishhut.API.Data
 		{
 			base.OnModelCreating(modelBuilder);
 
-			modelBuilder.Entity<Admin>()
-		.HasOne(a => a.Role)
-		.WithMany()
-		.HasForeignKey(a => a.RoleId);
 
 			modelBuilder.Entity<Staff>()
 				.HasOne(s => s.Role)
@@ -65,21 +60,23 @@ namespace RiversideFishhut.API.Data
 
 			// Add seed data for Roles
 			modelBuilder.Entity<Role>().HasData(
-				new Role { RoleId = 1, RoleName = "Admin", RoleDescription = "Administrator" },
-				new Role { RoleId = 2, RoleName = "Staff", RoleDescription = "Staff member" }
-			);
-
-			// Add seed data for Admins
-			modelBuilder.Entity<Admin>().HasData(
-				new Admin
-				{
-					AdminId = 1,
-					AdminName = "Admin",
-					AdminEmailAddress = "Admin@gmail.com",
-					AdminPassword = "Admin123",
-					RoleId = 1
+				new Role {
+					RoleId = 1, 
+					RoleName = "Admin", 
+					RoleDescription = "Administrator" 
+				},
+				new Role {
+					RoleId = 2, 
+					RoleName = "Staff", 
+					RoleDescription = "Staff member" 
+				},
+				new Role {
+					RoleId = 3, 
+					RoleName = "Waiter", 
+					RoleDescription = "Waiter" 
 				}
 			);
+
 
 			// Add seed data for Staffs
 			modelBuilder.Entity<Staff>().HasData(
@@ -87,16 +84,16 @@ namespace RiversideFishhut.API.Data
 				{
 					StaffId = 1,
 					StaffName = "Staff 1",
-					Description = "description1",
 					Password = "Password1",
+					Email = "asdsad@gmail.com",
 					RoleId = 1
 				},
 				new Staff
 				{
 					StaffId = 2,
 					StaffName = "Staff 2",
-					Description = "description2",
 					Password = "Password2",
+					Email = "sad@gmail.com",
 					RoleId = 2
 				}
 			);

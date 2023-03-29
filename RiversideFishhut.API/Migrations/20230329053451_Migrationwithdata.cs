@@ -4,7 +4,7 @@
 
 namespace RiversideFishhut.API.Migrations
 {
-    public partial class MigrationWithData : Migration
+    public partial class Migrationwithdata : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -92,36 +92,14 @@ namespace RiversideFishhut.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "admins",
-                columns: table => new
-                {
-                    AdminId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    AdminName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AdminEmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AdminPassword = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_admins", x => x.AdminId);
-                    table.ForeignKey(
-                        name: "FK_admins_roles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "roles",
-                        principalColumn: "RoleId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "staffs",
                 columns: table => new
                 {
                     StaffId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StaffName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -212,18 +190,14 @@ namespace RiversideFishhut.API.Migrations
                 values: new object[,]
                 {
                     { 1, "Administrator", "Admin" },
-                    { 2, "Staff member", "Staff" }
+                    { 2, "Staff member", "Staff" },
+                    { 3, "Waiter", "Waiter" }
                 });
 
             migrationBuilder.InsertData(
                 table: "websiteInfos",
                 columns: new[] { "InfoId", "Address", "Description", "LogoImage", "OnlineOrderLink", "PhoneNumber", "StoreName" },
                 values: new object[] { 1, "157 king st west Cambridge, ON, N3H 1B5", "This cozy restaurant specializes in traditional English fish and French fries, serving up freshly fried, crispy and flavorful fish sourced from local suppliers, and thick golden fries that make the perfect side dish.", "Logo name", "https://www.skipthedishes.com/riverside-fish-hut?utm_source=riversidefishhutmenu.ca&utm_medium=microsites&utm_campaign=microsites", "519-653-0788", "Riverside Fishhut" });
-
-            migrationBuilder.InsertData(
-                table: "admins",
-                columns: new[] { "AdminId", "AdminEmailAddress", "AdminName", "AdminPassword", "RoleId" },
-                values: new object[] { 1, "Admin@gmail.com", "Admin", "Admin123", 1 });
 
             migrationBuilder.InsertData(
                 table: "products",
@@ -238,11 +212,11 @@ namespace RiversideFishhut.API.Migrations
 
             migrationBuilder.InsertData(
                 table: "staffs",
-                columns: new[] { "StaffId", "Description", "Password", "RoleId", "StaffName" },
+                columns: new[] { "StaffId", "Email", "Password", "RoleId", "StaffName" },
                 values: new object[,]
                 {
-                    { 1, "description1", "Password1", 1, "Staff 1" },
-                    { 2, "description2", "Password2", 2, "Staff 2" }
+                    { 1, "asdsad@gmail.com", "Password1", 1, "Staff 1" },
+                    { 2, "sad@gmail.com", "Password2", 2, "Staff 2" }
                 });
 
             migrationBuilder.InsertData(
@@ -263,11 +237,6 @@ namespace RiversideFishhut.API.Migrations
                     { 4, 2 },
                     { 4, 3 }
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_admins_RoleId",
-                table: "admins",
-                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_foodTypes_ProductId",
@@ -292,9 +261,6 @@ namespace RiversideFishhut.API.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "admins");
-
             migrationBuilder.DropTable(
                 name: "businessHours");
 

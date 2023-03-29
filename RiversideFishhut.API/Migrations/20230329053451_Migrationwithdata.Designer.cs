@@ -12,57 +12,17 @@ using RiversideFishhut.API.Data;
 namespace RiversideFishhut.API.Migrations
 {
     [DbContext(typeof(RiversideFishhutDbContext))]
-    [Migration("20230327162340_MigrationWithData")]
-    partial class MigrationWithData
+    [Migration("20230329053451_Migrationwithdata")]
+    partial class Migrationwithdata
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.14")
+                .HasAnnotation("ProductVersion", "6.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("RiversideFishhut.API.Data.Admin", b =>
-                {
-                    b.Property<int>("AdminId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AdminId"), 1L, 1);
-
-                    b.Property<string>("AdminEmailAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AdminName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AdminPassword")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AdminId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("admins");
-
-                    b.HasData(
-                        new
-                        {
-                            AdminId = 1,
-                            AdminEmailAddress = "Admin@gmail.com",
-                            AdminName = "Admin",
-                            AdminPassword = "Admin123",
-                            RoleId = 1
-                        });
-                });
 
             modelBuilder.Entity("RiversideFishhut.API.Data.BusinessHour", b =>
                 {
@@ -391,6 +351,12 @@ namespace RiversideFishhut.API.Migrations
                             RoleId = 2,
                             RoleDescription = "Staff member",
                             RoleName = "Staff"
+                        },
+                        new
+                        {
+                            RoleId = 3,
+                            RoleDescription = "Waiter",
+                            RoleName = "Waiter"
                         });
                 });
 
@@ -402,7 +368,7 @@ namespace RiversideFishhut.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StaffId"), 1L, 1);
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -427,7 +393,7 @@ namespace RiversideFishhut.API.Migrations
                         new
                         {
                             StaffId = 1,
-                            Description = "description1",
+                            Email = "asdsad@gmail.com",
                             Password = "Password1",
                             RoleId = 1,
                             StaffName = "Staff 1"
@@ -435,7 +401,7 @@ namespace RiversideFishhut.API.Migrations
                         new
                         {
                             StaffId = 2,
-                            Description = "description2",
+                            Email = "sad@gmail.com",
                             Password = "Password2",
                             RoleId = 2,
                             StaffName = "Staff 2"
@@ -489,17 +455,6 @@ namespace RiversideFishhut.API.Migrations
                             PhoneNumber = "519-653-0788",
                             StoreName = "Riverside Fishhut"
                         });
-                });
-
-            modelBuilder.Entity("RiversideFishhut.API.Data.Admin", b =>
-                {
-                    b.HasOne("RiversideFishhut.API.Data.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("RiversideFishhut.API.Data.FoodType", b =>

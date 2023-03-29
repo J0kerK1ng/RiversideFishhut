@@ -65,8 +65,8 @@ namespace RiversideFishhut.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				//return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
-				return StatusCode(500, new CustomResponse(500, $"Internal Server Error: {ex.Message}. Inner exception: {ex.InnerException?.Message}", null));
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+				//return StatusCode(500, new CustomResponse(500, $"Internal Server Error: {ex.Message}. Inner exception: {ex.InnerException?.Message}", null));
 
 			}
 		}

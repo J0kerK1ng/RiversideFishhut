@@ -12,10 +12,9 @@ namespace RiversideFishhut.API.Data
 		public string StaffName { get; set; }
 
 		[Required]
-		public string Description { get; set; }
-
-		[Required]
 		public string Password { get; set; }
+
+		public string Email { get; set; }
 
 		[Required]
 		[ForeignKey(nameof(RoleId))]
