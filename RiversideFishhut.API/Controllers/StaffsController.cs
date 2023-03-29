@@ -36,74 +36,154 @@ namespace RiversideFishhut.API.Controllers
 			return _context.staffs.Any(e => e.StaffId == id);
 		}
 
-		// POST: api/staffs/login
-		[HttpPost("login")]
-		public async Task<ActionResult<object>> LoginStaff([FromBody] LoginRequest loginRequest)
+		// GET: api/staff
+		[HttpGet]
+		public async Task<ActionResult<CustomResponse>> GetAllStaff()
 		{
-			var staff = await _context.staffs
-				.Where(s => s.StaffName == loginRequest.StaffName && s.Password == loginRequest.Password)
-				.Select(s => new
-				{
-					s.StaffId,
-					s.RoleId,
-					s.StaffName
-				})
-				.FirstOrDefaultAsync();
-
-			if (staff == null)
-			{
-				return StatusCode(401, new { status = 401, message = "Invalid credentials" });
-			}
-
-			return StatusCode(200, new
-			{
-				status = 200,
-				message = "Login successful",
-				staff = new[] { staff }
-			});
-		}
-
-		// PUT: api/staffs/password/{id}
-		[HttpPut("password/{id}")]
-		public async Task<ActionResult<object>> ChangePassword(int id, [FromBody] PasswordChangeRequest passwordChangeRequest)
-		{
-			var staff = await _context.staffs.FindAsync(id);
-
-			if (staff == null)
-			{
-				return NotFound(new { status = 404, message = "Staff not found" });
-			}
-
-			staff.Password = passwordChangeRequest.NewPassword;
-			_context.Entry(staff).State = EntityState.Modified;
-
 			try
 			{
-				await _context.SaveChangesAsync();
-			}
-			catch (DbUpdateConcurrencyException)
-			{
-				if (!StaffExists(id))
-				{
-					return NotFound(new { status = 404, message = "Staff not found" });
-				}
-				else
-				{
-					throw;
-				}
-			}
+				var staffList = await _context.staffs
+					.Include(s => s.Role)
+					.ToListAsync();
 
-			return StatusCode(200, new
+				if (staffList == null || staffList.Count == 0)
+				{
+					return NotFound(new CustomResponse(404, "No staff found", null));
+				}
+
+				var result = staffList.Select(staffMember => new
+				{
+					staffMember.StaffId,
+					staffMember.StaffName,
+					Role = new
+					{
+						staffMember.Role.RoleId,
+						staffMember.Role.RoleName,
+						staffMember.Role.RoleDescription
+					},
+					Email = staffMember.Email // Assuming you have added an Email property to the Staff model
+				}).ToList();
+
+				return new CustomResponse(200, "Staff list retrieved", result);
+			}
+			catch (Exception ex)
 			{
-				status = 200,
-				message = "Password changed successfully",
-				data = (object)null
-			});
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
 		}
 
-		
 
-		
+
+
+		[HttpPost]
+		public async Task<ActionResult<object>> CreateStaffMember(StaffCreationRequest request)
+		{
+			try
+			{
+				Staff newStaff = new Staff
+				{
+					StaffName = request.StaffName,
+					Password = request.Password, // Don't forget to hash the password before storing it.
+					RoleId = request.RoleId,
+					Email = request.Email
+				};
+
+				_context.staffs.Add(newStaff);
+				await _context.SaveChangesAsync();
+
+				var response = new
+				{
+					Status = 200,
+					Message = "Staff created successfully",
+					Data = new
+					{
+						newStaff.StaffId,
+						newStaff.StaffName,
+						newStaff.Password, // Make sure not to return the actual password in a real-world application.
+						newStaff.RoleId,
+						newStaff.Email
+					}
+				};
+
+				return StatusCode(200, response);
+			}
+			catch (Exception ex)
+			{
+				//return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+				return StatusCode(500, new CustomResponse(500, $"Internal Server Error: {ex.Message}. Inner exception: {ex.InnerException?.Message}", null));
+			}
+		}
+
+
+
+
+
+		// PUT: api/staffs/password/{id}
+		[HttpPut("{id}")]
+		public async Task<ActionResult<object>> UpdateStaffMember(int id, StaffUpdateRequest request)
+		{
+			try
+			{
+				Staff staffToUpdate = await _context.staffs.FindAsync(id);
+
+				if (staffToUpdate == null)
+				{
+					return NotFound(new CustomResponse(404, "Staff member not found", null));
+				}
+
+				staffToUpdate.StaffName = request.StaffName;
+				staffToUpdate.Password = request.Password; // Don't forget to hash the password before updating it.
+				staffToUpdate.RoleId = request.RoleId;
+				staffToUpdate.Email = request.Email;
+
+				await _context.SaveChangesAsync();
+
+				var response = new
+				{
+					Status = 200,
+					Message = "Staff updated successfully",
+					Data = new
+					{
+						staffToUpdate.StaffId,
+						staffToUpdate.StaffName,
+						staffToUpdate.RoleId,
+						staffToUpdate.Email
+					}
+				};
+
+				return StatusCode(200, response);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
+		}
+
+
+
+		[HttpDelete("{id}")]
+		public async Task<ActionResult<CustomResponse>> DeleteStaffMember(int id)
+		{
+			try
+			{
+				var staffMember = await _context.staffs.FindAsync(id);
+
+				if (staffMember == null)
+				{
+					return NotFound(new CustomResponse(404, "Staff not found", null));
+				}
+
+				_context.staffs.Remove(staffMember);
+				await _context.SaveChangesAsync();
+
+				return new CustomResponse(200, "Staff deleted successfully", null);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+			}
+		}
+
 	}
 }
 

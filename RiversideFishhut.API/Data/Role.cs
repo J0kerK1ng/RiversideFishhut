@@ -10,6 +10,7 @@ namespace RiversideFishhut.API.Data
 		[Required]
 		public string RoleName { get; set; }
 		public string RoleDescription { get; set; }
+
 	}
 }
 
