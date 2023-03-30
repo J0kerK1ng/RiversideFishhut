@@ -35,6 +35,16 @@ namespace RiversideFishhut.API.Controllers
             return await _context.order.OrderByDescending(o => o.OrderId).Take(5).ToListAsync();
         }
 
+        [HttpGet("TodaysOrders")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetTodaysOrders()
+        {
+            DateTime today = DateTime.Today;
+            DateTime tomorrow = today.AddDays(1);
+
+            return await _context.order.Where(o => o.OrderDate >= today && o.OrderDate < tomorrow).OrderByDescending(o => o.OrderId).ToListAsync();
+        }
+
+
         //[HttpGet("{id}/OrderTotal")]
         //private async Task<double> GetTotalPrice(int orderId)
         //{
