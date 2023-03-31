@@ -27,6 +27,8 @@ namespace RiversideFishhut.API.Data
 
         public bool PaymentStatus { get; set; }
 
+        public List<Product> Food { get; set; }
+
         public decimal BeforeTax { get; set; }
 
         public decimal Tax { get; set; }

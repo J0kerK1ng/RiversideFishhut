@@ -35,6 +35,7 @@ namespace RiversideFishhut.API.Controllers
             return await _context.order.OrderByDescending(o => o.OrderId).Take(5).ToListAsync();
         }
 
+
         [HttpGet("TodaysOrders")]
         public async Task<ActionResult<IEnumerable<Order>>> GetTodaysOrders()
         {
@@ -44,34 +45,44 @@ namespace RiversideFishhut.API.Controllers
             return await _context.order.Where(o => o.OrderDate >= today && o.OrderDate < tomorrow).OrderByDescending(o => o.OrderId).ToListAsync();
         }
 
+        [HttpGet("PendingOrders")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetPendingOrders()
+        {
+            return await _context.order.Where(s => s.OrderStatusId != 4).ToListAsync();
+        }
 
-        //[HttpGet("{id}/OrderTotal")]
-        //private async Task<double> GetTotalPrice(int orderId)
-        //{
-        //    var order = await _context.order.Include(o => o.OrderLineItems).ThenInclude(oli => oli.Product).FirstOrDefaultAsync(o => o.OrderId == orderId);
-        //    var orderLineItems = await _context.orderLineItem 
+        [HttpGet("Tables")]
+        public async Task<ActionResult<IEnumerable<string[]>>> GetTables()
+        {
+            List<Order> currentOrders = await _context.order.Where(s => s.PaymentStatus == false && (s.table != null || s.table != "")).ToListAsync();
+            List<string[]> tables = new List<string[]>();
 
-        //    if (order == null)
-        //    {
-        //        return 0;
-        //    }
+            for (int i = 1;  i < 13; i++) 
+            {
+                bool added = false;
 
-        //    double totalPrice = 0;
+                foreach (var order in currentOrders)
+                {
+                    if (order.table == Convert.ToString(i))
+                    {
+                        string[] newTable = new string[] { Convert.ToString(i), "used" };
+                        tables.Add(newTable);
+                        added = true;
+                    }
 
-        //    foreach (var lineItem in order.OrderLineItems)
-        //    {
-        //        if (order.OrderTypeId == 1)
-        //        {
-        //            totalPrice += lineItem.Product.PriceDineIn * lineItem.Quantity;
-        //        }
-        //        else
-        //        {
-        //            totalPrice += lineItem.Product.PriceTakeOut * lineItem.Quantity;
-        //        }
-        //    }
+                }
 
-        //    return totalPrice;
-        //}
+                if (added == false)
+                {
+                    string[] newTable = new string[] { Convert.ToString(i), "available" };
+                    tables.Add(newTable);
+                }
+            }
+
+            return tables;
+        }
+
+
 
         // GET: api/Orders/5
         [HttpGet("{id}")]

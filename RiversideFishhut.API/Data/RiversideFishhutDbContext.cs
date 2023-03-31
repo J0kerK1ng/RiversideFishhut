@@ -21,7 +21,6 @@ namespace RiversideFishhut.API.Data
         public DbSet<OrderType> orderType { get; set; }
         public DbSet<OrderStatus> orderStatus { get; set; }
         public DbSet<Order> order { get; set; }
-        public DbSet<OrderLineItem> orderLineItem { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -352,6 +351,7 @@ namespace RiversideFishhut.API.Data
                     OrderTypeId = 1,
                     StaffId = 1,
                     OrderStatusId = 1,
+                    table = "1",
                     PaymentStatus = false,
                     OrderDate = DateTime.Now
                 },
@@ -361,6 +361,7 @@ namespace RiversideFishhut.API.Data
                     OrderTypeId = 2,
                     StaffId = 2,
                     OrderStatusId = 4,
+                    table = "2",
                     PaymentStatus = true,
                     OrderDate = DateTime.Now
                 },
@@ -370,6 +371,7 @@ namespace RiversideFishhut.API.Data
                     OrderTypeId = 1,
                     StaffId = 1,
                     OrderStatusId = 2,
+                    table = "3",
                     PaymentStatus = false,
                     OrderDate = DateTime.Now
                 },
