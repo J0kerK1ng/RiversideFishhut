@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RiversideFishhut.API.Data;
 
@@ -11,9 +12,10 @@ using RiversideFishhut.API.Data;
 namespace RiversideFishhut.API.Migrations
 {
     [DbContext(typeof(RiversideFishhutDbContext))]
-    partial class RiversideFishhutDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230331194525_OrderTestData")]
+    partial class OrderTestData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -352,6 +352,7 @@ namespace RiversideFishhut.API.Data
                     StaffId = 1,
                     OrderStatusId = 1,
                     table = "1",
+                    TotalCost = 120,
                     PaymentStatus = false,
                     OrderDate = DateTime.Now
                 },
@@ -362,6 +363,7 @@ namespace RiversideFishhut.API.Data
                     StaffId = 2,
                     OrderStatusId = 4,
                     table = "2",
+                    TotalCost = 52,
                     PaymentStatus = true,
                     OrderDate = DateTime.Now
                 },
@@ -399,8 +401,9 @@ namespace RiversideFishhut.API.Data
                     OrderTypeId = 3,
                     StaffId = 2,
                     OrderStatusId = 2,
+                    TotalCost = 523,
                     PaymentStatus = true,
-                    OrderDate = DateTime.Now
+                    OrderDate = DateTime.Now.AddDays(-2)
                 }
                 );
 

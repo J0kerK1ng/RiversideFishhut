@@ -51,13 +51,49 @@ namespace RiversideFishhut.API.Controllers
             return await _context.order.Where(s => s.OrderStatusId != 4).ToListAsync();
         }
 
+        [HttpGet("TodaysCompleteOrders")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetTodaysCompleteOrders()
+        {
+            DateTime today = DateTime.Today;
+            DateTime tomorrow = today.AddDays(1);
+
+            return await _context.order.Where(s => s.OrderStatusId == 4 && (s.OrderDate >= today && s.OrderDate < tomorrow)).ToListAsync();
+        }
+
+        [HttpGet("TodaysPaidOrders")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetTodaysPaidOrders()
+        {
+            DateTime today = DateTime.Today;
+            DateTime tomorrow = today.AddDays(1);
+
+            return await _context.order.Where(s => s.PaymentStatus == true && (s.OrderDate >= today && s.OrderDate < tomorrow)).ToListAsync();
+        }
+
+        [HttpGet("TodaysRevenue")]
+        public async Task<ActionResult<decimal>> GetTodaysRevenue()
+        {
+            DateTime today = DateTime.Today;
+            DateTime tomorrow = today.AddDays(1);
+
+            List<Order> todaysOrders = await _context.order.Where(s => s.PaymentStatus == true && (s.OrderDate >= today && s.OrderDate < tomorrow)).ToListAsync();
+
+            decimal total = 0;
+
+            foreach (var order in todaysOrders) 
+            {
+                total += order.TotalCost;
+            }
+
+            return total;
+        }
+
         [HttpGet("Tables")]
         public async Task<ActionResult<IEnumerable<string[]>>> GetTables()
         {
             List<Order> currentOrders = await _context.order.Where(s => s.PaymentStatus == false && (s.table != null || s.table != "")).ToListAsync();
             List<string[]> tables = new List<string[]>();
 
-            for (int i = 1;  i < 13; i++) 
+            for (int i = 1; i < 13; i++)
             {
                 bool added = false;
 
@@ -69,7 +105,6 @@ namespace RiversideFishhut.API.Controllers
                         tables.Add(newTable);
                         added = true;
                     }
-
                 }
 
                 if (added == false)
@@ -82,6 +117,53 @@ namespace RiversideFishhut.API.Controllers
             return tables;
         }
 
+
+        [HttpGet("RevenueHistory")]
+        public async Task<ActionResult<IEnumerable<string[]>>> GetRevenueHistory()
+        {
+            List<string[]> revenueByDay = new List<string[]>();
+
+            // Get all orders that have been paid
+            var paidOrders = await _context.order.Where(o => o.PaymentStatus).ToListAsync();
+
+            // Group orders by date
+            var ordersByDate = paidOrders.GroupBy(o => o.OrderDate.Date);
+
+            // Calculate revenue for each date
+            foreach (var orderGroup in ordersByDate)
+            {
+                DateTime date = orderGroup.Key;
+                decimal dineInTotal = 0;
+                decimal takeOutTotal = 0;
+                decimal phoneTotal = 0;
+                decimal total = 0;
+
+                // Calculate revenue for each order type
+                foreach (var order in orderGroup)
+                {
+                    if (order.OrderTypeId == 1)
+                    {
+                        dineInTotal += order.TotalCost;
+                    }
+                    else if (order.OrderTypeId == 2)
+                    {
+                        takeOutTotal += order.TotalCost;
+                    }
+                    else
+                    {
+                        phoneTotal += order.TotalCost;
+                    }
+
+                    total += order.TotalCost;
+                }
+
+                string[] newRevenue = new string[] { date.ToString(), dineInTotal.ToString(), takeOutTotal.ToString(), phoneTotal.ToString(), total.ToString() };
+
+                revenueByDay.Add(newRevenue);
+            }
+
+            return revenueByDay;
+        }
 
 
         // GET: api/Orders/5
