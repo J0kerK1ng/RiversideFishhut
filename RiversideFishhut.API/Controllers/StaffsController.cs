@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace RiversideFishhut.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class StaffsController : ControllerBase
 	{
 		private readonly RiversideFishhutDbContext _context;
@@ -109,8 +111,8 @@ namespace RiversideFishhut.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				//return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
-				return StatusCode(500, new CustomResponse(500, $"Internal Server Error: {ex.Message}. Inner exception: {ex.InnerException?.Message}", null));
+				return StatusCode(500, new CustomResponse(500, "Internal Server Error", null));
+				//return StatusCode(500, new CustomResponse(500, $"Internal Server Error: {ex.Message}. Inner exception: {ex.InnerException?.Message}", null));
 			}
 		}
 

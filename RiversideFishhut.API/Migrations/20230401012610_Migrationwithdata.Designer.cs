@@ -12,7 +12,7 @@ using RiversideFishhut.API.Data;
 namespace RiversideFishhut.API.Migrations
 {
     [DbContext(typeof(RiversideFishhutDbContext))]
-    [Migration("20230329053451_Migrationwithdata")]
+    [Migration("20230401012610_Migrationwithdata")]
     partial class Migrationwithdata
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -164,6 +164,198 @@ namespace RiversideFishhut.API.Migrations
                         });
                 });
 
+            modelBuilder.Entity("RiversideFishhut.API.Data.Order", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"), 1L, 1);
+
+                    b.Property<decimal>("BeforeTax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OrderStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("PaymentStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("StaffId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Tax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("table")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("OrderTypeId");
+
+                    b.HasIndex("StaffId");
+
+                    b.ToTable("order");
+
+                    b.HasData(
+                        new
+                        {
+                            OrderId = 1,
+                            BeforeTax = 0m,
+                            OrderDate = new DateTime(2023, 3, 31, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3251),
+                            OrderStatusId = 1,
+                            OrderTypeId = 1,
+                            PaymentStatus = false,
+                            StaffId = 1,
+                            Tax = 0m,
+                            TotalCost = 120m,
+                            table = "1"
+                        },
+                        new
+                        {
+                            OrderId = 2,
+                            BeforeTax = 0m,
+                            OrderDate = new DateTime(2023, 3, 31, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3283),
+                            OrderStatusId = 3,
+                            OrderTypeId = 2,
+                            PaymentStatus = true,
+                            StaffId = 2,
+                            Tax = 0m,
+                            TotalCost = 52m,
+                            table = "2"
+                        },
+                        new
+                        {
+                            OrderId = 3,
+                            BeforeTax = 0m,
+                            OrderDate = new DateTime(2023, 3, 31, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3285),
+                            OrderStatusId = 2,
+                            OrderTypeId = 1,
+                            PaymentStatus = false,
+                            StaffId = 1,
+                            Tax = 0m,
+                            TotalCost = 0m,
+                            table = "3"
+                        },
+                        new
+                        {
+                            OrderId = 4,
+                            BeforeTax = 0m,
+                            OrderDate = new DateTime(2023, 3, 31, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3286),
+                            OrderStatusId = 1,
+                            OrderTypeId = 1,
+                            PaymentStatus = false,
+                            StaffId = 1,
+                            Tax = 0m,
+                            TotalCost = 0m
+                        },
+                        new
+                        {
+                            OrderId = 5,
+                            BeforeTax = 0m,
+                            OrderDate = new DateTime(2023, 3, 31, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3287),
+                            OrderStatusId = 1,
+                            OrderTypeId = 1,
+                            PaymentStatus = false,
+                            StaffId = 1,
+                            Tax = 0m,
+                            TotalCost = 0m
+                        },
+                        new
+                        {
+                            OrderId = 6,
+                            BeforeTax = 0m,
+                            OrderDate = new DateTime(2023, 3, 29, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3289),
+                            OrderStatusId = 2,
+                            OrderTypeId = 3,
+                            PaymentStatus = true,
+                            StaffId = 2,
+                            Tax = 0m,
+                            TotalCost = 523m
+                        });
+                });
+
+            modelBuilder.Entity("RiversideFishhut.API.Data.OrderStatus", b =>
+                {
+                    b.Property<int>("OrderStatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderStatusId"), 1L, 1);
+
+                    b.Property<string>("OrderStatusName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OrderStatusId");
+
+                    b.ToTable("orderStatus");
+
+                    b.HasData(
+                        new
+                        {
+                            OrderStatusId = 1,
+                            OrderStatusName = "In Progress"
+                        },
+                        new
+                        {
+                            OrderStatusId = 2,
+                            OrderStatusName = "Ready"
+                        },
+                        new
+                        {
+                            OrderStatusId = 3,
+                            OrderStatusName = "Complete"
+                        });
+                });
+
+            modelBuilder.Entity("RiversideFishhut.API.Data.OrderType", b =>
+                {
+                    b.Property<int>("OrderTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderTypeId"), 1L, 1);
+
+                    b.Property<string>("TypeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OrderTypeId");
+
+                    b.ToTable("orderType");
+
+                    b.HasData(
+                        new
+                        {
+                            OrderTypeId = 1,
+                            TypeName = "Dine In"
+                        },
+                        new
+                        {
+                            OrderTypeId = 2,
+                            TypeName = "Take Out"
+                        },
+                        new
+                        {
+                            OrderTypeId = 3,
+                            TypeName = "Phone Order"
+                        });
+                });
+
             modelBuilder.Entity("RiversideFishhut.API.Data.Product", b =>
                 {
                     b.Property<int>("ProductId")
@@ -186,6 +378,9 @@ namespace RiversideFishhut.API.Migrations
                     b.Property<decimal>("Dine_in_price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ProductName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -196,6 +391,8 @@ namespace RiversideFishhut.API.Migrations
                     b.HasKey("ProductId");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("OrderId");
 
                     b.ToTable("products");
 
@@ -464,11 +661,34 @@ namespace RiversideFishhut.API.Migrations
                         .HasForeignKey("ProductId");
                 });
 
+            modelBuilder.Entity("RiversideFishhut.API.Data.Order", b =>
+                {
+                    b.HasOne("RiversideFishhut.API.Data.OrderType", "OrderType")
+                        .WithMany()
+                        .HasForeignKey("OrderTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RiversideFishhut.API.Data.Staff", "Staff")
+                        .WithMany()
+                        .HasForeignKey("StaffId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrderType");
+
+                    b.Navigation("Staff");
+                });
+
             modelBuilder.Entity("RiversideFishhut.API.Data.Product", b =>
                 {
                     b.HasOne("RiversideFishhut.API.Data.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId");
+
+                    b.HasOne("RiversideFishhut.API.Data.Order", null)
+                        .WithMany("Food")
+                        .HasForeignKey("OrderId");
 
                     b.Navigation("Category");
                 });
@@ -511,6 +731,11 @@ namespace RiversideFishhut.API.Migrations
             modelBuilder.Entity("RiversideFishhut.API.Data.FoodType", b =>
                 {
                     b.Navigation("ProductFoodTypes");
+                });
+
+            modelBuilder.Entity("RiversideFishhut.API.Data.Order", b =>
+                {
+                    b.Navigation("Food");
                 });
 
             modelBuilder.Entity("RiversideFishhut.API.Data.Product", b =>

@@ -19,6 +19,10 @@ namespace RiversideFishhut.API.Data
 		public DbSet<Role> roles { get; set; }
 		public DbSet<ProductFoodType> productFoodTypes { get; set; }
 
+		public DbSet<OrderType> orderType { get; set; }
+		public DbSet<OrderStatus> orderStatus { get; set; }
+		public DbSet<Order> order { get; set; }
+
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
@@ -299,8 +303,108 @@ namespace RiversideFishhut.API.Data
 				}
 
 			);
+			modelBuilder.Entity<OrderType>().HasData(
+				new OrderType
+				{
+					OrderTypeId = 1,
+					TypeName = "Dine In"
+				},
+				new OrderType
+				{
+					OrderTypeId = 2,
+					TypeName = "Take Out"
+				},
+				new OrderType
+				{
+					OrderTypeId = 3,
+					TypeName = "Phone Order"
+				}
+				);
+
+			modelBuilder.Entity<OrderStatus>().HasData(
+				new OrderStatus
+				{
+					OrderStatusId = 1,
+					OrderStatusName = "In Progress"
+				},
+				new OrderStatus
+				{
+					OrderStatusId = 2,
+					OrderStatusName = "Ready"
+				},
+				new OrderStatus
+				{
+					OrderStatusId = 3,
+					OrderStatusName = "Complete"
+				}
+				);
+			modelBuilder.Entity<Order>().HasData(
+				new Order
+				{
+					OrderId = 1,
+					OrderTypeId = 1,
+					StaffId = 1,
+					OrderStatusId = 1,
+					table = "1",
+					TotalCost = 120,
+					PaymentStatus = false,
+					OrderDate = DateTime.Now
+				},
+				new Order
+				{
+					OrderId = 2,
+					OrderTypeId = 2,
+					StaffId = 2,
+					OrderStatusId = 3,
+					table = "2",
+					TotalCost = 52,
+					PaymentStatus = true,
+					OrderDate = DateTime.Now
+				},
+				new Order
+				{
+					OrderId = 3,
+					OrderTypeId = 1,
+					StaffId = 1,
+					OrderStatusId = 2,
+					table = "3",
+					PaymentStatus = false,
+					OrderDate = DateTime.Now
+				},
+				new Order
+				{
+					OrderId = 4,
+					OrderTypeId = 1,
+					StaffId = 1,
+					OrderStatusId = 1,
+					PaymentStatus = false,
+					OrderDate = DateTime.Now
+				},
+				new Order
+				{
+					OrderId = 5,
+					OrderTypeId = 1,
+					StaffId = 1,
+					OrderStatusId = 1,
+					PaymentStatus = false,
+					OrderDate = DateTime.Now
+				},
+				new Order
+				{
+					OrderId = 6,
+					OrderTypeId = 3,
+					StaffId = 2,
+					OrderStatusId = 2,
+					TotalCost = 523,
+					PaymentStatus = true,
+					OrderDate = DateTime.Now.AddDays(-2)
+				}
+				);
+
 
 		}
+
+		
 	} 
 }
 

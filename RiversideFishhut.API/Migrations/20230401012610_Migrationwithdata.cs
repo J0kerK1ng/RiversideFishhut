@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -37,6 +38,32 @@ namespace RiversideFishhut.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "orderStatus",
+                columns: table => new
+                {
+                    OrderStatusId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderStatusName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_orderStatus", x => x.OrderStatusId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "orderType",
+                columns: table => new
+                {
+                    OrderTypeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TypeName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_orderType", x => x.OrderTypeId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "roles",
                 columns: table => new
                 {
@@ -69,29 +96,6 @@ namespace RiversideFishhut.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "products",
-                columns: table => new
-                {
-                    ProductId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AltName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Dine_in_price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Take_out_price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_products", x => x.ProductId);
-                    table.ForeignKey(
-                        name: "FK_products_categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "categories",
-                        principalColumn: "CategoryId");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "staffs",
                 columns: table => new
                 {
@@ -111,6 +115,69 @@ namespace RiversideFishhut.API.Migrations
                         principalTable: "roles",
                         principalColumn: "RoleId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "order",
+                columns: table => new
+                {
+                    OrderId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderTypeId = table.Column<int>(type: "int", nullable: false),
+                    table = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StaffId = table.Column<int>(type: "int", nullable: false),
+                    OrderStatusId = table.Column<int>(type: "int", nullable: false),
+                    PaymentStatus = table.Column<bool>(type: "bit", nullable: false),
+                    BeforeTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Tax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_order", x => x.OrderId);
+                    table.ForeignKey(
+                        name: "FK_order_orderType_OrderTypeId",
+                        column: x => x.OrderTypeId,
+                        principalTable: "orderType",
+                        principalColumn: "OrderTypeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_order_staffs_StaffId",
+                        column: x => x.StaffId,
+                        principalTable: "staffs",
+                        principalColumn: "StaffId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "products",
+                columns: table => new
+                {
+                    ProductId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AltName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Dine_in_price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Take_out_price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: true),
+                    OrderId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_products", x => x.ProductId);
+                    table.ForeignKey(
+                        name: "FK_products_categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "categories",
+                        principalColumn: "CategoryId");
+                    table.ForeignKey(
+                        name: "FK_products_order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "order",
+                        principalColumn: "OrderId");
                 });
 
             migrationBuilder.CreateTable(
@@ -185,6 +252,26 @@ namespace RiversideFishhut.API.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "orderStatus",
+                columns: new[] { "OrderStatusId", "OrderStatusName" },
+                values: new object[,]
+                {
+                    { 1, "In Progress" },
+                    { 2, "Ready" },
+                    { 3, "Complete" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "orderType",
+                columns: new[] { "OrderTypeId", "TypeName" },
+                values: new object[,]
+                {
+                    { 1, "Dine In" },
+                    { 2, "Take Out" },
+                    { 3, "Phone Order" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "roles",
                 columns: new[] { "RoleId", "RoleDescription", "RoleName" },
                 values: new object[,]
@@ -201,13 +288,13 @@ namespace RiversideFishhut.API.Migrations
 
             migrationBuilder.InsertData(
                 table: "products",
-                columns: new[] { "ProductId", "AltName", "CategoryId", "Description", "Dine_in_price", "ProductName", "Take_out_price" },
+                columns: new[] { "ProductId", "AltName", "CategoryId", "Description", "Dine_in_price", "OrderId", "ProductName", "Take_out_price" },
                 values: new object[,]
                 {
-                    { 1, "2 PC W/C", 1, "Description", 10m, "2Pc Whitefish & Chips", 9m },
-                    { 2, "2 PC COD/C", 1, "Description", 12m, "2Pc Cod & Chips", 11m },
-                    { 3, "2 PC HDK/C", 1, "Description", 14m, "2Pc Haddock & Chips", 13m },
-                    { 4, "2PC HB/C", 1, "Description", 16m, "2Pc Halibut & Chips", 15m }
+                    { 1, "2 PC W/C", 1, "Description", 10m, null, "2Pc Whitefish & Chips", 9m },
+                    { 2, "2 PC COD/C", 1, "Description", 12m, null, "2Pc Cod & Chips", 11m },
+                    { 3, "2 PC HDK/C", 1, "Description", 14m, null, "2Pc Haddock & Chips", 13m },
+                    { 4, "2PC HB/C", 1, "Description", 16m, null, "2Pc Halibut & Chips", 15m }
                 });
 
             migrationBuilder.InsertData(
@@ -217,6 +304,19 @@ namespace RiversideFishhut.API.Migrations
                 {
                     { 1, "asdsad@gmail.com", "Password1", 1, "Staff 1" },
                     { 2, "sad@gmail.com", "Password2", 2, "Staff 2" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "order",
+                columns: new[] { "OrderId", "BeforeTax", "OrderDate", "OrderStatusId", "OrderTypeId", "PaymentStatus", "StaffId", "Tax", "TotalCost", "notes", "table" },
+                values: new object[,]
+                {
+                    { 1, 0m, new DateTime(2023, 3, 31, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3251), 1, 1, false, 1, 0m, 120m, null, "1" },
+                    { 2, 0m, new DateTime(2023, 3, 31, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3283), 3, 2, true, 2, 0m, 52m, null, "2" },
+                    { 3, 0m, new DateTime(2023, 3, 31, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3285), 2, 1, false, 1, 0m, 0m, null, "3" },
+                    { 4, 0m, new DateTime(2023, 3, 31, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3286), 1, 1, false, 1, 0m, 0m, null, null },
+                    { 5, 0m, new DateTime(2023, 3, 31, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3287), 1, 1, false, 1, 0m, 0m, null, null },
+                    { 6, 0m, new DateTime(2023, 3, 29, 21, 26, 10, 108, DateTimeKind.Local).AddTicks(3289), 2, 3, true, 2, 0m, 523m, null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -244,6 +344,16 @@ namespace RiversideFishhut.API.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_order_OrderTypeId",
+                table: "order",
+                column: "OrderTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_order_StaffId",
+                table: "order",
+                column: "StaffId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_productFoodTypes_TypeId",
                 table: "productFoodTypes",
                 column: "TypeId");
@@ -252,6 +362,11 @@ namespace RiversideFishhut.API.Migrations
                 name: "IX_products_CategoryId",
                 table: "products",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_products_OrderId",
+                table: "products",
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_staffs_RoleId",
@@ -265,10 +380,10 @@ namespace RiversideFishhut.API.Migrations
                 name: "businessHours");
 
             migrationBuilder.DropTable(
-                name: "productFoodTypes");
+                name: "orderStatus");
 
             migrationBuilder.DropTable(
-                name: "staffs");
+                name: "productFoodTypes");
 
             migrationBuilder.DropTable(
                 name: "websiteInfos");
@@ -277,13 +392,22 @@ namespace RiversideFishhut.API.Migrations
                 name: "foodTypes");
 
             migrationBuilder.DropTable(
-                name: "roles");
-
-            migrationBuilder.DropTable(
                 name: "products");
 
             migrationBuilder.DropTable(
                 name: "categories");
+
+            migrationBuilder.DropTable(
+                name: "order");
+
+            migrationBuilder.DropTable(
+                name: "orderType");
+
+            migrationBuilder.DropTable(
+                name: "staffs");
+
+            migrationBuilder.DropTable(
+                name: "roles");
         }
     }
 }

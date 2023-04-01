@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RiversideFishhut.API.Data;
@@ -10,6 +11,7 @@ namespace RiversideFishhut.API.Controllers
 {
 	[Route("api/product-foodType")]
 	[ApiController]
+	[Authorize]
 	public class FoodTypesController : ControllerBase
 	{
 		private readonly RiversideFishhutDbContext _context;

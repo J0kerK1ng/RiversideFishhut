@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RiversideFishhut.API.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RiversideFishhut.API.Controllers
 {
 	[Route("api/business-hours")]
 	[ApiController]
+	[Authorize]
 	public class BusinessHoursController : ControllerBase
 	{
 		private readonly RiversideFishhutDbContext _context;
