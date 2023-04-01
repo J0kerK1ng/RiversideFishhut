@@ -89,7 +89,6 @@ namespace RiversideFishhut.API.Data
                 {
                     StaffId = 1,
                     StaffName = "Staff 1",
-                    Description = "description1",
                     Password = "Password1",
                     RoleId = 1
                 },
@@ -97,7 +96,6 @@ namespace RiversideFishhut.API.Data
                 {
                     StaffId = 2,
                     StaffName = "Staff 2",
-                    Description = "description2",
                     Password = "Password2",
                     RoleId = 2
                 }
@@ -304,7 +302,7 @@ namespace RiversideFishhut.API.Data
                 }
                 );
 
-        modelBuilder.Entity<OrderType>().HasData(
+            modelBuilder.Entity<OrderType>().HasData(
                 new OrderType
                 {
                     OrderTypeId = 1,
@@ -326,21 +324,16 @@ namespace RiversideFishhut.API.Data
                 new OrderStatus
                 {
                     OrderStatusId = 1,
-                    OrderStatusName = "Ordered"
-                },
-                new OrderStatus
-                {
-                    OrderStatusId = 2,
                     OrderStatusName = "In Progress"
                 },
                 new OrderStatus
                 {
-                    OrderStatusId = 3,
+                    OrderStatusId = 2,
                     OrderStatusName = "Ready"
                 },
                 new OrderStatus
                 {
-                    OrderStatusId = 4,
+                    OrderStatusId = 3,
                     OrderStatusName = "Complete"
                 }
                 );
@@ -361,7 +354,7 @@ namespace RiversideFishhut.API.Data
                     OrderId = 2,
                     OrderTypeId = 2,
                     StaffId = 2,
-                    OrderStatusId = 4,
+                    OrderStatusId = 3,
                     table = "2",
                     TotalCost = 52,
                     PaymentStatus = true,
